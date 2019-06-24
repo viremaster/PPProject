@@ -4,6 +4,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
+import main.java.project.Type;
+
 /** Class holding the results of the Simple Pascal checker. */
 public class Result {
 	/** Mapping from statements and expressions to the atomic

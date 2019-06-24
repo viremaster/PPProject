@@ -1,4 +1,4 @@
-package main.java.project.tobedeleted;
+package main.java.project;
 
 /** Pascal data type kind. */
 public enum TypeKind {

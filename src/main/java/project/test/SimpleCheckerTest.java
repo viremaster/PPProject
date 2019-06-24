@@ -13,10 +13,10 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
 
 import main.java.project.Checker;
+import main.java.project.Type;
 import main.java.project.tobedeleted.ErrorListener;
 import main.java.project.tobedeleted.ParseException;
 import main.java.project.tobedeleted.Result;
-import main.java.project.tobedeleted.Type;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

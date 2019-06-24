@@ -10,8 +10,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import main.java.project.tobedeleted.ParseException;
 import main.java.project.tobedeleted.Result;
-import main.java.project.tobedeleted.Scope;
-import main.java.project.tobedeleted.Type;
 import pp.block6.cc.pascal.EmojiLangBaseListener;
 import pp.block6.cc.pascal.EmojiLangParser;
 
@@ -21,7 +19,7 @@ public class Checker extends EmojiLangBaseListener {
 	/** Result of the latest call of {@link #check}. */
 	private Result result;
 	/** Variable scope for the latest call of {@link #check}. */
-	private Scope scope;
+	private SymbolTableNestedScopes scope;
 	/** List of errors collected in the latest call of {@link #check}. */
 	private List<String> errors;
 
@@ -30,7 +28,7 @@ public class Checker extends EmojiLangBaseListener {
 	 * @throws ParseException if an error was found during checking.
 	 */
 	public Result check(ParseTree tree) throws ParseException {
-		this.scope = new Scope();
+		this.scope = new SymbolTableNestedScopes();
 		this.result = new Result();
 		this.errors = new ArrayList<>();
 		new ParseTreeWalker().walk(this, tree);
@@ -53,17 +51,30 @@ public class Checker extends EmojiLangBaseListener {
 	public void exitBlockStat(EmojiLangParser.BlockStatContext ctx) {
 		setEntry(ctx, entry(ctx.block()));
 	}
+	
+	@Override
+	public void enterWhileStat(EmojiLangParser.WhileStatContext ctx) {
+		this.scope.openScope();
+	}
 
 	@Override
 	public void exitWhileStat(EmojiLangParser.WhileStatContext ctx) {
 		setEntry(ctx, entry(ctx.expr()));
 		checkType(ctx.expr(), Type.BOOL);
+		this.scope.closeScope();
+		
 	}
 
+	@Override
+	public void enterIfStat(EmojiLangParser.IfStatContext ctx) {
+		this.scope.openScope();
+	}
+	
 	@Override
 	public void exitIfStat(EmojiLangParser.IfStatContext ctx) {
 		setEntry(ctx, entry(ctx.expr()));
 		checkType(ctx.expr(), Type.BOOL);
+		this.scope.closeScope();
 	}
 
 	@Override
@@ -76,12 +87,12 @@ public class Checker extends EmojiLangBaseListener {
 	public void exitIdTarget(EmojiLangParser.IdTargetContext ctx) {
 		setEntry(ctx, ctx);
 		String id = ctx.ID().getText();
-		Type type = this.scope.type(id);
-		if(type == null) {
+		Var var = this.scope.getVar(id);
+		if(var == null) {
 			addError(ctx, "target id type was not yet defined");
 		} else {
-			setType(ctx, type);
-			setOffset(ctx, this.scope.offset(id));
+			setType(ctx, var.getType());
+			setOffset(ctx, var.getOffset());
 		}
 
 	}
@@ -89,13 +100,12 @@ public class Checker extends EmojiLangBaseListener {
 	@Override
 	public void exitDeclvar(EmojiLangParser.DeclvarContext ctx) {
 		setEntry(ctx, ctx.type());
-		System.out.println("a");
 		Type type = getType(ctx.type());
 		if(getType(ctx.expr()) != type) {
 			addError(ctx, "assignment type " + type + " does not match " + getType(ctx.expr()));
 		} else {
-			this.scope.put(ctx.ID().getText(),type);
-			setOffset(ctx, this.scope.offset(ctx.ID().getText()));
+			this.scope.add(ctx.ID().getText(),type);
+			setOffset(ctx, this.scope.getVar(ctx.ID().getText()).getOffset());
 		}
 	}
 
@@ -143,12 +153,12 @@ public class Checker extends EmojiLangBaseListener {
 	@Override
 	public void exitIdExpr(EmojiLangParser.IdExprContext ctx) {
 		String id = ctx.ID().getText();
-		Type type = this.scope.type(id);
-		if (type == null) {
+		Var var = this.scope.getVar(id);
+		if (var == null) {
 			addError(ctx, "Variable '%s' not declared", id);
 		} else {
-			setType(ctx, type);
-			setOffset(ctx, this.scope.offset(id));
+			setType(ctx, var.getType());
+			setOffset(ctx, var.getOffset());
 			setEntry(ctx, ctx);
 		}
 	}

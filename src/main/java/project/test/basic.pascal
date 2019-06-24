@@ -1,11 +1,10 @@
 Program basic;
 
 { 
-	boolean	a = true; 
-	a = true;
-	if (true) {
-		int b = 1;
-		b = 2;
+	boolean	a = false; 
+	if (a) {
+	boolean b = true;
 	};
-	b = 1;
+	boolean a = true;
+	b = false;
 }
