@@ -1,14 +1,14 @@
-package project;
+package main.java.project;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SymbolTableNestedScopesInteger{
+public class SymbolTableNestedScopesBoolean{
 
-    Map<Integer , Map<String, Integer>> scopemap = new HashMap<>();
+    Map<Integer , Map<String, Boolean>> scopemap = new HashMap<>();
     Integer currentscope = 0 ;
 
-    public SymbolTableNestedScopesInteger(){
+    public SymbolTableNestedScopesBoolean(){
         scopemap.put(currentscope, new HashMap<>());
     }
 
@@ -26,7 +26,7 @@ public class SymbolTableNestedScopesInteger{
         }
     }
 
-    public boolean add(String id, Integer val) {
+    public boolean add(String id, Boolean val) {
         if(contains(id)){
             return false;
         }
@@ -35,7 +35,7 @@ public class SymbolTableNestedScopesInteger{
     }
 
     public boolean contains(String id) {
-        for(Map<String, Integer> s:scopemap.values()){
+        for(Map<String, Boolean> s:scopemap.values()){
             if(s.containsKey(id)){
                 return true;
             }
@@ -43,7 +43,7 @@ public class SymbolTableNestedScopesInteger{
         return  false;
     }
 
-    public boolean change(String id, Integer val) {
+    public boolean change(String id, Boolean val) {
         if(!contains(id)){
             return false;
         }
