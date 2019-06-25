@@ -3,6 +3,8 @@ package main.java.project;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.java.project.antlr.EmojiLangBaseListener;
+import main.java.project.antlr.EmojiLangParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -10,9 +12,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import main.java.project.tobedeleted.ParseException;
 import main.java.project.tobedeleted.Result;
-import pp.block6.cc.pascal.EmojiLangBaseListener;
-import pp.block6.cc.pascal.EmojiLangParser;
-
 
 /** Class to type check and calculate flow entries and variable offsets. */
 public class Checker extends EmojiLangBaseListener {

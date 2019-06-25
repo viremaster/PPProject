@@ -4,6 +4,8 @@ package main.java.project.test;
 import java.io.File;
 import java.io.IOException;
 
+import main.java.project.antlr.EmojiLangLexer;
+import main.java.project.antlr.EmojiLangParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
@@ -21,13 +23,11 @@ import main.java.project.tobedeleted.Result;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import pp.block6.cc.pascal.*;
-
 @SuppressWarnings("javadoc")
 public class SimpleCheckerTest {
 	private final static String ABS_PATH = new File("").getAbsolutePath();
-	private final static String BASE_DIR = "\\src\\src\\main\\java\\project\\test";
-	private final static String EXT = ".pascal";
+	private final static String BASE_DIR = "\\src\\main\\java\\project\\test";
+	private final static String EXT = ".emoji";
 	private final Checker checker = new Checker();
 
 	@Test
