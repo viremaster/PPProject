@@ -17,6 +17,9 @@ stat: type ID ASS expr				 		#declvar
     | WHILE LPAR expr RPAR stat           	#whileStat
     | block                          		#blockStat
     | PARBEGIN LBRACE block block RBRACE	#parStat
+    | LOCK ID								#lockStat
+    | UNLOCK ID								#lockStat
+    | GLOBAL type ID ASS expr				#declgvar
     //| IN LPAR target RPAR  				#inStat
     //| OUT LPAR expr RPAR   				#outStat
     ;
@@ -60,6 +63,9 @@ type: INT  #intType
     ;
 
 // Keywords
+GLOBAL:  G L O B A L ;
+UNLOCK:  U N L O C K ;
+LOCK: 	 L O C K ;
 PARBEGIN:P A R B E G I N ;
 PAREND:  P A R E N D ;
 BOOLEAN: B O O L E A N ;
