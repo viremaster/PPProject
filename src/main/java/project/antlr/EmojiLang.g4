@@ -18,7 +18,7 @@ stat: type ID ASS expr				 		#declvar
     | block                          		#blockStat
     | PARBEGIN LBRACE block block RBRACE	#parStat
     | LOCK ID								#lockStat
-    | UNLOCK ID								#lockStat
+    | UNLOCK ID								#unlockStat
     | GLOBAL type ID ASS expr				#declgvar
     //| IN LPAR target RPAR  				#inStat
     //| OUT LPAR expr RPAR   				#outStat
