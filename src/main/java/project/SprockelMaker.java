@@ -30,27 +30,23 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     @Override
     public String visitDeclvar(EmojiLangParser.DeclvarContext ctx) {
-        varmap.put(ctx.ID().getText(), reg(ctx));
+        String address = reg(ctx);
+        varmap.put(ctx.ID().getText(), address);
         visit(ctx.expr());
-        return null;
-    }
-
-    @Override
-    public String visitAssStat(EmojiLangParser.AssStatContext ctx) {
-        visit(ctx.target());
-        String R1 = res;
-        visit(ctx.expr());
-        String R2 = res;
-        String result = "Load " + R2 + " " + R1 + ", \n";
+        String result = "Pop regA, \n";
+        result += "Store regA " + address + ", \n";
         prog += result;
         return result;
     }
 
     @Override
-    public String visitIdTarget(EmojiLangParser.IdTargetContext ctx) {
-        visit(ctx.ID());
-        res = varmap.get(ctx.ID().getText());
-        return null;
+    public String visitAssStat(EmojiLangParser.AssStatContext ctx) {
+        visit(ctx.expr());
+        String result = "Pop regA, \n";
+        String address = reg(ctx.target());
+        result += "Store regA " + address + ", \n";
+        prog += result;
+        return result;
     }
 
     @Override
@@ -97,29 +93,27 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     @Override
     public String visitPrfExpr(EmojiLangParser.PrfExprContext ctx) {
         visit(ctx.expr());
-        String R1 = res;
-        String R2 = reg(ctx);
-        String result = "";
+        String result = "Pop regA, \n";
         if(ctx.prfOp().getText().equals("-")){
-            result += "Compute Mul " + R1 + " -1 " + R2 + ", \n";
+            result += "Load (ImmValue -1) regB, \n";
+            result += "Compute Mul regA regB regA, \n";
         } else {
-            result += "Compute Xor " + R1 + " true " + R2 + ", \n";
+            result += "Load (ImmValue 1) regB, \n";
+            result += "Compute Xor regA regB regA, \n";
         }
-        res = R2;
+        result += "Push regA, \n";
         prog += result;
         return result;
     }
 
     @Override
     public String visitMultExpr(EmojiLangParser.MultExprContext ctx) {
-        String result = "";
         visit(ctx.expr(0));
-        String R1 = res;
         visit(ctx.expr(1));
-        String R2 = res;
-        String R3 = reg(ctx);
-        result += "Compute Mul " + R1 + "" + R2 + "" + R3 + ", \n";
-        res = R3;
+        String result = "Pop regA, \n";
+        result += "Pop regB, \n";
+        result += "Compute Mul regA regB regA, \n";
+        result += "Push regA, \n";
         prog += result;
         return result;
     }
@@ -127,20 +121,18 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     @Override
     public String visitPlusExpr(EmojiLangParser.PlusExprContext ctx) {
         visit(ctx.expr(0));
-        String R1 = res;
         visit(ctx.expr(1));
-        String R2 = res;
-        String R3 = reg(ctx);
-        String result = "";
+        String result = "Pop regA, \n";
+        result += "Pop regB, \n";
         switch(ctx.plusOp().getText()) {
             case "+":
-                result += "Compute Add " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute Add regA regB regA, \n";
                 break;
             case "-":
-                result += "Compute Sub " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute Sub regA regB regA, \n";
                 break;
         }
-        res = R3;
+        result += "Push regA, \n";
         prog += result;
         return result;
     }
@@ -148,32 +140,30 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     @Override
     public String visitCompExpr(EmojiLangParser.CompExprContext ctx) {
         visit(ctx.expr(0));
-        String R1 = res;
         visit(ctx.expr(1));
-        String R2 = res;
-        String R3 = reg(ctx);
-        String result = "";
+        String result = "Pop regA, \n";
+        result += "Pop regB, \n";
         switch(ctx.compOp().getText()) {
             case "<":
-                result += "Compute Lt " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute Lt regA regB regA, \n";
                 break;
             case "<=":
-                result += "Compute LtE " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute LtE regA regB regA, \n";
                 break;
             case "==":
-                result += "Compute Equal " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute Equal regA regB regA, \n";
                 break;
             case ">=":
-                result += "Compute GtE " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute GtE regA regB regA, \n";
                 break;
             case ">":
-                result += "Compute Gt " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute Gt regA regB regA, \n";
                 break;
             case "!=":
-                result += "Compute NEq " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute NEq regA regB regA, \n";
                 break;
         }
-        res = R3;
+        result += "Push regA, \n";
         prog += result;
         return result;
     }
@@ -181,20 +171,18 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     @Override
     public String visitBoolExpr(EmojiLangParser.BoolExprContext ctx) {
         visit(ctx.expr(0));
-        String R1 = res;
         visit(ctx.expr(1));
-        String R2 = res;
-        String R3 = reg(ctx);
-        String result = "";
+        String result = "Pop regA, \n";
+        result += "Pop regB, \n";
         switch(ctx.boolOp().AND().getText().toLowerCase()) {
             case "and":
-                result += "Compute And " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute And regA regB regA, \n";
                 break;
             case "or":
-                result += "Compute Or " + R1 + "" + R2 + "" + R3 + ", \n";
+                result += "Compute Or regA regB regA, \n";
                 break;
         }
-        res = R3;
+        result += "Push regA, \n";
         prog += result;
         return result;
     }
@@ -207,43 +195,43 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     @Override
     public String visitIdExpr(EmojiLangParser.IdExprContext ctx) {
-        res = varmap.get(ctx.ID().getText());
-        return null;
+        String address = reg(ctx);
+        String result = "Load " + address + " regA, \n";
+        result += "Push regA, \n";
+        prog += result;
+        return result;
     }
 
     @Override
     public String visitNumExpr(EmojiLangParser.NumExprContext ctx) {
-        String R1 = reg(ctx);
-        String result = "Load (ImmValue " + Integer.parseInt(ctx.NUM().getText()) + ") " + R1 + ", \n";
-        res = R1;
+        String result = "Load (ImmValue " + Integer.parseInt(ctx.NUM().getText()) + ") regA, \n";
+        result += "Push regA, \n";
         prog += result;
         return result;
     }
 
     @Override
     public String visitTrueExpr(EmojiLangParser.TrueExprContext ctx) {
-        String R1 = reg(ctx);
-        String result = "Load (ImmValue 1) " + R1 + ", \n";
-        res = R1;
+        String result = "Load (ImmValue 1) regA, \n";
+        result += "Push regA, \n";
         prog += result;
         return result;
     }
 
     @Override
     public String visitFalseExpr(EmojiLangParser.FalseExprContext ctx) {
-        String R1 = reg(ctx);
-        String result = "Load (ImmValue 0) " + R1 + ", \n";
-        res = R1;
+        String result = "Load (ImmValue 0) regA, \n";
+        result += "Push regA, \n";
         prog += result;
         return result;
     }
 
     private String reg(ParseTree node) {
-        String result = this.regs.get(node);
+        String result = this.varmap.get(node.getText());
         if (result == null) {
-            result = this.registerlist.get(this.regCount%6);
-            this.regs.put(node, result);
-            this.regCount++;
+            result = "(DirAddr " + regCount + ")";
+            this.varmap.put(node.getText(), result);
+            this.regCount += 4;
         }
         return result;
     }
