@@ -5,6 +5,6 @@ Program basic;
 	if (a) {
 	boolean b = true;
 	};
-	boolean a = true;
+	a = true;
 	b = false;
 }
