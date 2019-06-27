@@ -156,28 +156,24 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     @Override
     public String visitIfStat(EmojiLangParser.IfStatContext ctx) {
         visit(ctx.expr());
-        int y = 0; //size of the jump, so after the stat part and the jump
-        prog += "Branch " + res + " (Abs y)" + ", \n";
+        prog += "Pop regA";
+        prog += "Branch regA (Abs y), \n";
         if(ctx.stat().size() == 2) {
             visit(ctx.stat(1));
         }
-        int x = 0; //size of the jump, so after the if part
-        prog += "Jump (Rel x)" + ", \n";
+        prog += "Jump (Rel x), \n";
         visit(ctx.stat(0));
         return null;
     }
 
     @Override
     public String visitWhileStat(EmojiLangParser.WhileStatContext ctx) {
-        // Labels.. still.. dont.. work.. why am I like this!
-        int y = 0; //size of the jump, so after the jump
         visit(ctx.expr());
-        prog += "Branch " + res + " (Abs y)" + ", \n";
-        int z = 0; //size of the jump, so to after the while loop
-        prog += "Jump (Rel z)" + ", \n";
+        prog += "Pop regA";
+        prog += "Branch regA (Abs y), \n";
+        prog += "Jump (Rel z), \n";
         visit(ctx.stat());
-        int x = 0; //size of the jump, so back to the comparison
-        prog += "Jump (Rel x)" + ", \n";
+        prog += "Jump (Rel x), \n";
         return null;
     }
 
