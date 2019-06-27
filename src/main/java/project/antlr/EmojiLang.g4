@@ -21,7 +21,7 @@ stat: type ID ASS expr				 		#declvar
     | UNLOCK ID								#unlockStat
     | GLOBAL type ID ASS expr				#declgvar
     //| IN LPAR target RPAR  				#inStat
-    //| OUT LPAR expr RPAR   				#outStat
+    | OUT LPAR expr RPAR   				    #outStat
     ;
 
 /** Target of an assignment. */

@@ -2,11 +2,10 @@ Program basic;
 
 { 
 	global int a = 6;
+	a = 7;
 	parbegin {
 		{
-			lock o;
-			a = a + 11;
-			unlock o;
+
 			parbegin {
 				{
 					lock o;
@@ -21,9 +20,7 @@ Program basic;
 			};
 		}
 		{
-			lock o;
-			a = a + 14;
-			unlock o;
+
 			parbegin {
 				{
 					lock o;

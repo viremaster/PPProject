@@ -5,18 +5,12 @@ import java.util.*;
 import main.java.project.antlr.EmojiLangBaseVisitor;
 import main.java.project.antlr.EmojiLangParser;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     private String prog;
 
     private int regCount;
-
-    private ParseTreeProperty<String> regs;
-
-    private String res;
-    private List<String> registerlist = Arrays.asList("regA","regB","regC","regD","regE","regF");
 
     private Map<String, String> varmap = new HashMap<>();
     
@@ -26,7 +20,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     
     public String generate(ParseTree tree) {
         this.prog = "";
-        this.regs = new ParseTreeProperty<>();
         this.regCount = 0;
         tree.accept(this);
         return this.prog;
@@ -34,7 +27,14 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     
     //Concurrency
-    
+
+    @Override
+    public String visitProgram(EmojiLangParser.ProgramContext ctx) {
+        visit(ctx.block());
+        prog += "Endprog";
+        return null;
+    }
+
     @Override
     public String visitDeclgvar(EmojiLangParser.DeclgvarContext ctx) {
     	int size = varmap.keySet().size();
@@ -50,13 +50,12 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     
     }
-    
+
     @Override
     public String visitLockStat(EmojiLangParser.LockStatContext ctx) {
     	Integer memaddr = 0;
     	String id = ctx.ID().getText();
     	if (gvars.containsKey(id)) {
-        	System.out.println(2);
     		memaddr = gvars.get(id);
     	} else {
     		memaddr = gvars.keySet().size();
@@ -138,6 +137,14 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         }
         prog += result;
         return result;
+    }
+
+    @Override
+    public String visitOutStat(EmojiLangParser.OutStatContext ctx) {
+        visit(ctx.expr());
+        prog += "Pop regA, \n";
+        prog += "WriteInst regA numberIO, \n";
+        return null;
     }
 
     @Override
