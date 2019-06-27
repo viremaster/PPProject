@@ -1,10 +1,41 @@
 Program basic;
 
 { 
-	boolean	a = false; 
-	if (a) {
-	boolean b = true;
+	global int a = 6;
+	parbegin {
+		{
+			lock o;
+			a = a + 11;
+			unlock o;
+			parbegin {
+				{
+					lock o;
+					a = a + 12;
+					unlock o;
+				}
+				{
+					lock o;
+					a = a + 13;
+					unlock o;
+				}
+			};
+		}
+		{
+			lock o;
+			a = a + 14;
+			unlock o;
+			parbegin {
+				{
+					lock o;
+					a = a + 15;
+					unlock o;
+				}
+				{
+					lock o;
+					a = a + 16;
+					unlock o;
+				}
+			};
+		}
 	};
-	a = true;
-	b = false;
 }
