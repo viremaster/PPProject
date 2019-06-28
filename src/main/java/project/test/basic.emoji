@@ -2,7 +2,6 @@ Program basic;
 
 { 
 	global int a = 6;
-<<<<<<< HEAD
 
 	parbegin({
 		lock b;
@@ -47,42 +46,4 @@ Program basic;
 	});
 	join;
 	out(a);
-=======
-	parbegin {
-		{
-			lock o;
-			a = a + 11;
-			unlock o;
-			parbegin {
-				{
-					lock o;
-					a = a + 12;
-					unlock o;
-				}
-				{
-					lock o;
-					a = a + 13;
-					unlock o;
-				}
-			};
-		}
-		{
-			lock o;
-			a = a + 14;
-			unlock o;
-			parbegin {
-				{
-					lock o;
-					a = a + 15;
-					unlock o;
-				}
-				{
-					lock o;
-					a = a + 16;
-					unlock o;
-				}
-			};
-		}
-	};
->>>>>>> parent of 0dd0b33... changed scopemap to work for seperate threads
 }

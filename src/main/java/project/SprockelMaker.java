@@ -5,18 +5,12 @@ import java.util.*;
 import main.java.project.antlr.EmojiLangBaseVisitor;
 import main.java.project.antlr.EmojiLangParser;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     private String prog;
 
     private int regCount;
-
-    private ParseTreeProperty<String> regs;
-
-    private String res;
-    private List<String> registerlist = Arrays.asList("regA","regB","regC","regD","regE","regF");
 
     private Map<String, String> varmap = new HashMap<>();
     
@@ -31,7 +25,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         gvars.put("threadtargetlock", 2);
         gvars.put("threadcounter", 3);
         this.prog = "";
-        this.regs = new ParseTreeProperty<>();
         this.regCount = 0;
         tree.accept(this);
         return this.prog;
@@ -39,7 +32,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     
     //Concurrency
-<<<<<<< HEAD
 
     @Override
     public String visitProgram(EmojiLangParser.ProgramContext ctx) {
@@ -98,9 +90,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     	return result;
     }
 
-=======
-    
->>>>>>> parent of 0dd0b33... changed scopemap to work for seperate threads
     @Override
     public String visitDeclgvar(EmojiLangParser.DeclgvarContext ctx) {
     	int size = gvars.keySet().size();
@@ -116,13 +105,12 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     
     }
-    
+
     @Override
     public String visitLockStat(EmojiLangParser.LockStatContext ctx) {
     	Integer memaddr = 0;
     	String id = ctx.ID().getText();
     	if (gvars.containsKey(id)) {
-        	System.out.println(2);
     		memaddr = gvars.get(id);
     	} else {
     		memaddr = gvars.keySet().size();
@@ -235,7 +223,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     }
 
     @Override
-<<<<<<< HEAD
     public String visitOutStat(EmojiLangParser.OutStatContext ctx) {
         visit(ctx.expr());
         prog += "Pop regA, \n";
@@ -244,8 +231,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     }
 
     @Override
-=======
->>>>>>> parent of 0dd0b33... changed scopemap to work for seperate threads
     public String visitBlockStat(EmojiLangParser.BlockStatContext ctx) {
         return visit(ctx.block());
     }
