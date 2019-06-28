@@ -2,37 +2,48 @@ Program basic;
 
 { 
 	global int a = 6;
-	a = 7;
-	parbegin {
-		{
 
-			parbegin {
-				{
-					lock o;
-					a = a + 12;
-					unlock o;
-				}
-				{
-					lock o;
-					a = a + 13;
-					unlock o;
-				}
-			};
-		}
-		{
-
-			parbegin {
-				{
-					lock o;
-					a = a + 15;
-					unlock o;
-				}
-				{
-					lock o;
-					a = a + 16;
-					unlock o;
-				}
-			};
-		}
-	};
+	parbegin({
+		lock b;
+		a = a + 10;
+		unlock b;
+	});
+	
+	parbegin({
+		lock b;
+		a = a + 10;
+		unlock b;
+	});
+	
+		parbegin({
+		lock b;
+		a = a + 10;
+		unlock b;
+	});
+	
+		parbegin({
+		lock b;
+		a = a + 10;
+		unlock b;
+	});
+	
+		parbegin({
+		lock b;
+		a = a + 10;
+		unlock b;
+	});
+	
+		parbegin({
+		lock b;
+		a = a + 10;
+		unlock b;
+	});
+	
+			parbegin({
+		lock b;
+		a = a + 10;
+		unlock b;
+	});
+	join;
+	out(a);
 }

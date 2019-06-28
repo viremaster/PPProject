@@ -15,10 +15,15 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     private Map<String, String> varmap = new HashMap<>();
     
     private Map<String, Integer> gvars = new HashMap<>();
+   
     
     private int totalThreads = 0;
     
     public String generate(ParseTree tree) {
+        gvars.put("threadstarterlock", 0);
+        gvars.put("threadrunnerlock", 1);
+        gvars.put("threadtargetlock", 2);
+        gvars.put("threadcounter", 3);
         this.prog = "";
         this.regCount = 0;
         tree.accept(this);
@@ -30,14 +35,64 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     @Override
     public String visitProgram(EmojiLangParser.ProgramContext ctx) {
+    	
+    	int trl = gvars.get("threadrunnerlock");
+    	int ttl = gvars.get("threadtargetlock");
+    	int tc = gvars.get("threadcounter");
+    	
+    	prog += "Compute Equal regSprID reg0 regB, \n";
+    	prog += "Branch regB (Rel 21), \n";
+
+    	prog += "TestAndSet (DirAddr " + trl + "), \n";
+    	prog += "Receive regA, \n";
+    	prog += "Compute Equal regA reg0 regB, \n";
+        prog += "Branch regB (Rel (-3)), \n";
+        
+        // increase thread counter
+        
+        prog += "ReadInstr (DirAddr " + tc + "), \n";
+        prog += "Receive regA, \n";
+        prog += "Load (ImmValue 1) regB, \n";
+        prog += "Compute Add regA regB regA, \n";
+        prog += "WriteInstr regA (DirAddr " + tc + "), \n";
+        prog += "ReadInstr (DirAddr " + tc + "), \n";
+        prog += "Receive regB, \n";
+        prog += "Compute NEq regA regB regC, \n";
+        prog += "Branch regC (Rel (-4)), \n";
+        
+    	// settarget
+        
+        prog += "ReadInstr (DirAddr " + ttl + "), \n";
+    	prog += "Receive regA, \n";
+    	prog += "Compute Equal regA reg0 regB, \n";
+        prog += "Branch regB (Rel (-3)), \n";
+        prog += "WriteInstr reg0 (DirAddr " + ttl + "), \n";
+        
+    	// unlock
+        prog += "WriteInstr reg0 (DirAddr " + trl + "), \n";
+        
+        // jump
+        
+        prog += "Jump (Ind regA), \n";
+        
+    	
         visit(ctx.block());
-        prog += "Endprog";
+        prog += "EndProg";
         return null;
+    }
+    
+    @Override
+    public String visitJoinstat(EmojiLangParser.JoinstatContext ctx) {
+    	String result = "ReadInstr (DirAddr " + gvars.get("threadcounter") + "), \n";
+    	result += "Receive regA, \n";
+    	result += "Branch regA (Rel (-2)), \n";
+    	prog += result;
+    	return result;
     }
 
     @Override
     public String visitDeclgvar(EmojiLangParser.DeclgvarContext ctx) {
-    	int size = varmap.keySet().size();
+    	int size = gvars.keySet().size();
         gvars.put(ctx.ID().getText(), size);
         visit(ctx.expr());
         String result = "Pop regA, \n";
@@ -72,8 +127,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     
     @Override
     public String visitUnlockStat(EmojiLangParser.UnlockStatContext ctx) {
-    	String result = "Load (ImmValue 0) regA, \n";
-    	result += "WriteInstr regA (DirAddr " + gvars.get(ctx.ID().getText()) + "), \n";
+    	String result = "WriteInstr reg0 (DirAddr " + gvars.get(ctx.ID().getText()) + "), \n";
     	prog += result;
 		return result;
     
@@ -81,27 +135,56 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     
     @Override
     public String visitParStat(EmojiLangParser.ParStatContext ctx) {
-    	prog += "Load (ImmValue ) regA, \n";
+    	
+    	int trl = gvars.get("threadrunnerlock");
+    	int tsl = gvars.get("threadstarterlock");
+    	int ttl = gvars.get("threadtargetlock");
+    	int tc = gvars.get("threadcounter");
+    	
+    	// lock
+    	prog += "TestAndSet (DirAddr " + tsl + "), \n";
+    	prog += "Receive regA, \n";
+    	prog += "Compute Equal regA reg0 regB, \n";
+        prog += "Branch regB (Rel (-3)), \n";
+    	
+    	// settarget
+        prog += "Load (ImmValue ) regA, \n";
         int insert1 = prog.length() - 9;
-        prog += "Compute Lt regA regSprID regA, \n";
-        
-    	prog += "Branch regA (Rel ), \n";
-        int insert2 = prog.length() - 3;
+        prog += "WriteInstr regA (DirAddr " + ttl + "), \n";
+        prog += "ReadInstr (DirAddr " + ttl + "), \n";
+    	prog += "Receive regA, \n";
+        prog += "Branch regA (Rel (-2)), \n";
+    	
+    	// unlock
+        prog += "WriteInstr reg0 (DirAddr " + tsl + "), \n";
+    	
+    	prog += "Jump (Rel  ), \n";
+        int insert2 = prog.length() - 2;
         int split1 = prog.split("\n").length;
+        visit(ctx.block());
         
-        visit(ctx.block(0));
-        prog += "Jump (Rel ), \n";
-        int insert3 = prog.length() - 1;
+    	prog += "TestAndSet (DirAddr " + trl + "), \n";
+    	prog += "Receive regA, \n";
+    	prog += "Compute Equal regA reg0 regB, \n";
+        prog += "Branch regB (Rel (-3)), \n";
+        
+        prog += "ReadInstr (DirAddr " + tc + "), \n";
+        prog += "Receive regB, \n";
+        prog += "Load (ImmValue 1) regB, \n";
+        prog += "Compute Sub regA regB regA, \n";
+        prog += "WriteInstr regA (DirAddr " + tc + "), \n";
+        prog += "ReadInstr (DirAddr " + tc + "), \n";
+        prog += "Receive regB, \n";
+        prog += "Compute NEq regA regB regC, \n";
+        prog += "Branch regC (Rel (-4)), \n";
+        
+        prog += "WriteInstr reg0 (DirAddr " + trl + "), \n";
+        
+        prog += "EndProg, \n";
         int split2 = prog.split("\n").length;
         
-        prog = prog.substring(0, insert1) + totalThreads++ + prog.substring(insert1, prog.length());
-        
-        visit(ctx.block(1));
-        int split3 = prog.split("\n").length;
-        
-
+        prog = prog.substring(0, insert1) + (split1) + prog.substring(insert1, prog.length());
         prog = prog.substring(0, insert2) + (split2 - split1 + 1) + prog.substring(insert2, prog.length());
-        prog = prog.substring(0, insert3) + (split3 - split2 + 1) + prog.substring(insert3, prog.length());
 		return prog;
     
     }
@@ -143,7 +226,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     public String visitOutStat(EmojiLangParser.OutStatContext ctx) {
         visit(ctx.expr());
         prog += "Pop regA, \n";
-        prog += "WriteInst regA numberIO, \n";
+        prog += "WriteInstr regA numberIO, \n";
         return null;
     }
 

@@ -16,10 +16,11 @@ stat: type ID ASS expr				 		#declvar
     | IF LPAR expr RPAR stat (ELSE stat)? 	#ifStat
     | WHILE LPAR expr RPAR stat           	#whileStat
     | block                          		#blockStat
-    | PARBEGIN LBRACE block block RBRACE	#parStat
+    | PARBEGIN LPAR block RPAR				#parStat
     | LOCK ID								#lockStat
     | UNLOCK ID								#unlockStat
     | GLOBAL type ID ASS expr				#declgvar
+    | JOIN 									#joinstat
     //| IN LPAR target RPAR  				#inStat
     | OUT LPAR expr RPAR   				    #outStat
     ;
@@ -63,6 +64,7 @@ type: INT  #intType
     ;
 
 // Keywords
+JOIN:	 J O I N ;
 GLOBAL:  G L O B A L ;
 UNLOCK:  U N L O C K ;
 LOCK: 	 L O C K ;
