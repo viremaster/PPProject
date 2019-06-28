@@ -22,7 +22,7 @@ stat: type ID ASS expr				 		#declvar
     | GLOBAL type ID ASS expr				#declgvar
     | JOIN 									#joinstat
     //| IN LPAR target RPAR  				#inStat
-    | OUT LPAR expr RPAR   				    #outStat
+    //| OUT LPAR expr RPAR   				#outStat
     ;
 
 /** Target of an assignment. */
