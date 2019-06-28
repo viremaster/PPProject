@@ -2,48 +2,14 @@ Program basic;
 
 { 
 	global int a = 6;
-
+	int c = 5;
 	parbegin({
 		lock b;
 		a = a + 10;
 		unlock b;
+		c = 1;
 	});
-	
-	parbegin({
-		lock b;
-		a = a + 10;
-		unlock b;
-	});
-	
-		parbegin({
-		lock b;
-		a = a + 10;
-		unlock b;
-	});
-	
-		parbegin({
-		lock b;
-		a = a + 10;
-		unlock b;
-	});
-	
-		parbegin({
-		lock b;
-		a = a + 10;
-		unlock b;
-	});
-	
-		parbegin({
-		lock b;
-		a = a + 10;
-		unlock b;
-	});
-	
-			parbegin({
-		lock b;
-		a = a + 10;
-		unlock b;
-	});
+	c = 8;
 	join;
 	out(a);
 }

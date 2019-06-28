@@ -12,7 +12,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     private int regCount;
 
-    private Map<String, String> varmap = new HashMap<>();
+    private SymbolTableNestedScopesInteger varmap = new SymbolTableNestedScopesInteger();
     
     private Map<String, Integer> gvars = new HashMap<>();
    
@@ -136,6 +136,9 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     @Override
     public String visitParStat(EmojiLangParser.ParStatContext ctx) {
     	
+    	SymbolTableNestedScopesInteger temp = this.varmap;
+    	this.varmap = new SymbolTableNestedScopesInteger();
+    	
     	int trl = gvars.get("threadrunnerlock");
     	int tsl = gvars.get("threadstarterlock");
     	int ttl = gvars.get("threadtargetlock");
@@ -185,6 +188,9 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         
         prog = prog.substring(0, insert1) + (split1) + prog.substring(insert1, prog.length());
         prog = prog.substring(0, insert2) + (split2 - split1 + 1) + prog.substring(insert2, prog.length());
+        
+    	this.varmap = temp;
+        
 		return prog;
     
     }
@@ -193,8 +199,9 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     
     @Override
     public String visitDeclvar(EmojiLangParser.DeclvarContext ctx) {
-        String address = reg(ctx);
-        varmap.put(ctx.ID().getText(), address);
+    	String address = "(DirAddr " + regCount + ")";
+        this.varmap.add(ctx.ID().getText(), address);
+        this.regCount += 4;
         visit(ctx.expr());
         String result = "Pop regA, \n";
         result += "Store regA " + address + ", \n";
@@ -215,7 +222,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         	result += "Compute NEq regA regB regC, \n";
         	result += "Branch regC (Rel (-4)), \n";
         } else {
-	        String address = reg(ctx.target());
+	        String address = this.varmap.getInt(ctx.target().getText());
 	        result += "Store regA " + address + ", \n";
         }
         prog += result;
@@ -378,7 +385,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         	result += "ReadInstr (DirAddr " + gvars.get(id) + "), \n";
         	result += "Receive regA, \n";
     	} else {
-	        String address = reg(ctx);
+	        String address = this.varmap.getInt(ctx.getText());
 	        result = "Load " + address + " regA, \n";
     	}
     	result += "Push regA, \n";
@@ -410,14 +417,5 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
-    private String reg(ParseTree node) {
-        String result = this.varmap.get(node.getText());
-        if (result == null) {
-            result = "(DirAddr " + regCount + ")";
-            this.varmap.put(node.getText(), result);
-            this.regCount += 4;
-        }
-        return result;
-    }
 }
 
