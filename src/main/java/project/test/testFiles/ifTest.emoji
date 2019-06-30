@@ -7,4 +7,5 @@ Program iftest;
     } else {
         a = a + 2;
     };
+    out(a);
 }
