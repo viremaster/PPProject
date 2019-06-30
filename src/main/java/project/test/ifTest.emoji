@@ -1,0 +1,10 @@
+Program iftest;
+
+{
+    boolean a = true;
+    if (a){
+        a = a + 1;
+    } else {
+        a = a + 2;
+    };
+}

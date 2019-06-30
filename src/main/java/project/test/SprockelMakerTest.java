@@ -17,12 +17,12 @@ import java.io.IOException;
 
 public class SprockelMakerTest {
     private final static String ABS_PATH = new File("").getAbsolutePath();
-    private final static String BASE_DIR = "\\src\\src\\main\\java\\project\\test";
+    private final static String BASE_DIR = "\\src\\main\\java\\project\\test";
     private final static String EXT = ".emoji";
     private static SprockelMaker sprockelMaker = new SprockelMaker();
 
     public static void main(String[] args) throws IOException, ParseException {
-        ParseTree parsed = parse("basic");
+        ParseTree parsed = parse("whileTest");
         String generated = sprockelMaker.generate(parsed);
         System.out.println(generated);
     }

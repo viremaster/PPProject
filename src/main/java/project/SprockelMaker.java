@@ -252,25 +252,48 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     @Override
     public String visitIfStat(EmojiLangParser.IfStatContext ctx) {
+
         visit(ctx.expr());
-        prog += "Pop regA";
-        prog += "Branch regA (Abs y), \n";
+        prog += "Pop regA, \n";
+        prog += "Branch regA (Abs ), \n";
+        int ins1 = prog.length() - 4;
         if(ctx.stat().size() == 2) {
+            varmap.openScope();
             visit(ctx.stat(1));
+            varmap.closeScope();
         }
-        prog += "Jump (Rel x), \n";
+        prog += "Jump (Abs ), \n";
+        int ins2 = prog.length() - 2;
+        int split1 = prog.split("\n").length + 1;
+        varmap.openScope();
         visit(ctx.stat(0));
+        varmap.closeScope();
+        int split2 = prog.split("\n").length + 1;
+        prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
+        prog = prog.substring(0, ins2) + (split2) + prog.substring(ins2);
         return null;
     }
 
     @Override
     public String visitWhileStat(EmojiLangParser.WhileStatContext ctx) {
+        int split3 = prog.split("\n").length + 1;
         visit(ctx.expr());
-        prog += "Pop regA";
-        prog += "Branch regA (Abs y), \n";
-        prog += "Jump (Rel z), \n";
+        prog += "Pop regA, \n";
+        prog += "Branch regA (Abs ), \n";
+        int ins1 = prog.length() - 4;
+        prog += "Jump (Abs ), \n";
+        int ins2 = prog.length() - 2;
+        int split1 = prog.split("\n").length + 1;
+        varmap.openScope();
         visit(ctx.stat());
-        prog += "Jump (Rel x), \n";
+        varmap.closeScope();
+        prog += "Jump (Abs ), \n";
+        int ins3 = prog.length();
+        int split2 = prog.split("\n").length + 1;
+
+        prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
+        prog = prog.substring(0, ins2) + (split2) + prog.substring(ins2);
+        prog = prog.substring(0, ins3) + (split3) + prog.substring(ins3);
         return null;
     }
 
