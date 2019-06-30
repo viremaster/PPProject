@@ -284,15 +284,14 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         prog += "Jump (Abs ), \n";
         int ins2 = prog.length() - 2;
         int split1 = prog.split("\n").length + 1;
+        prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
         varmap.openScope();
         visit(ctx.stat());
         varmap.closeScope();
         prog += "Jump (Abs ), \n";
-        int ins3 = prog.length();
         int split2 = prog.split("\n").length + 1;
-
-        prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
         prog = prog.substring(0, ins2) + (split2) + prog.substring(ins2);
+        int ins3 = prog.length() - 4;
         prog = prog.substring(0, ins3) + (split3) + prog.substring(ins3);
         return null;
     }
