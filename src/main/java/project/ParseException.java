@@ -1,4 +1,4 @@
-package main.java.project.tobedeleted;
+package main.java.project;
 
 import java.util.List;
 

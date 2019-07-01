@@ -1,10 +1,10 @@
 package main.java.project.test;
 
+import main.java.project.ParseException;
 import main.java.project.SprockelMaker;
 import main.java.project.antlr.EmojiLangLexer;
 import main.java.project.antlr.EmojiLangParser;
-import main.java.project.tobedeleted.ErrorListener;
-import main.java.project.tobedeleted.ParseException;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
@@ -28,16 +28,10 @@ public class SprockelMakerTest {
     }
 
     private static ParseTree parse(String filename) throws IOException, ParseException {
-        ErrorListener listener = new ErrorListener();
         Lexer lexer = new EmojiLangLexer(CharStreams.fromPath(new File(ABS_PATH + BASE_DIR, filename + EXT).toPath()));
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(listener);
         TokenStream tokens = new CommonTokenStream(lexer);
         EmojiLangParser parser = new EmojiLangParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(listener);
         ParseTree result = parser.program();
-        listener.throwException();
         return result;
     }
 

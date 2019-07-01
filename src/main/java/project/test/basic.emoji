@@ -7,7 +7,7 @@ Program basic;
 		lock b;
 		a = a + 10;
 		unlock b;
-		c = 1;
+		boolean c = true;
 	});
 	c = 8;
 	join;

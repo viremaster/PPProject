@@ -1,13 +1,15 @@
 package main.java.project;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class SymbolTableNestedScopes{
 
-    Map<Integer , Map<String, Var>> scopemap = new HashMap<>();
+    Map<Integer , Map<String, Var>> scopemap = new TreeMap<>(Collections.reverseOrder());
     Integer currentscope = 0;
     private List<Integer> sizes = new ArrayList<>();
     private int size;
