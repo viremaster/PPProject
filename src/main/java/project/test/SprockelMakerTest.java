@@ -18,8 +18,8 @@ import java.io.IOException;
 
 public class SprockelMakerTest {
     private final static String ABS_PATH = new File("").getAbsolutePath();
-    private final static String BASE_DIR_INPUT = "\\src\\main\\java\\project\\test\\testFiles\\";
-    private final static String BASE_DIR_OUTPUT = "\\src\\main\\java\\project\\test\\outputFiles\\";
+    private final static String BASE_DIR_INPUT = "\\src\\src\\main\\java\\project\\test\\testFiles\\";
+    private final static String BASE_DIR_OUTPUT = "\\src\\src\\main\\java\\project\\test\\outputFiles\\";
     private static SprockelMaker sprockelMaker = new SprockelMaker();
 
     public static void main(String[] args) throws IOException, ParseException {
@@ -39,7 +39,7 @@ public class SprockelMakerTest {
     }
 
     private static ParseTree parse(String filename) throws IOException, ParseException {
-        Lexer lexer = new EmojiLangLexer(CharStreams.fromPath(new File(ABS_PATH + BASE_DIR, filename + EXT).toPath()));
+        Lexer lexer = new EmojiLangLexer(CharStreams.fromPath(new File(ABS_PATH + BASE_DIR_INPUT + filename + ".emoji").toPath()));
         TokenStream tokens = new CommonTokenStream(lexer);
         EmojiLangParser parser = new EmojiLangParser(tokens);
         ParseTree result = parser.program();
