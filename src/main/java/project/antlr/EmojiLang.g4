@@ -47,7 +47,7 @@ expr: prfOp expr        #prfExpr
 prfOp: MINUS | NOT;
 
 /** Multiplicative operator. */
-multOp: STAR;
+multOp: STAR | SLASH;
 
 /** Additive operator. */
 plusOp: PLUS | MINUS;
@@ -70,22 +70,22 @@ UNLOCK:  U N L O C K ;
 LOCK: 	 L O C K ;
 PARBEGIN:P A R B E G I N ;
 PAREND:  P A R E N D ;
-BOOLEAN: B O O L E A N ;
+BOOLEAN: B O O L E A N | '\u{1F313}';
 ELSE:    E L S E ;
 END:     E N D ;
-FALSE:   F A L S E ;
+FALSE:   F A L S E | '\u{1F311}';
 IN:      I N ;
-INT: 	 I N T ;
+INT: 	 I N T | '\u{1F522}';
 IF:      I F ;
 OUT:     O U T ;
 PROGRAM: P R O G R A M ;
-TRUE:    T R U E ;
+TRUE:    T R U E | '\u{1F315}';
 WHILE:   W H I L E ;
 
 OR:		'||';
 AND:	'&&';
 NOT:	'!';
-ASS:    '=';
+ASS:    '=' | '\u2B05';
 COLON:  ':';
 COMMA:  ',';
 DOT:    '.';
@@ -97,12 +97,12 @@ LE:     '<=';
 LBRACE: '{';
 LPAR:   '(';
 LT:     '<';
-MINUS:  '-';
+MINUS:  '-' | '\u2796';
 NE:     '!=';
-PLUS:   '+';
+PLUS:   '+' | '\u2795';
 RBRACE: '}';
 RPAR:   ')';
-SEMI:   ';';
+SEMI:   ';' | '\u{1F6AB}';
 SLASH:  '/';
 STAR:   '*';
 

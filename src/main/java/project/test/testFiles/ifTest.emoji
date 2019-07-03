@@ -3,9 +3,9 @@ Program iftest;
 {
     boolean a = true;
     if (a){
-        a = a + 1;
+        a = a - 1;
     } else {
-        a = a + 2;
+        a = a - 2;
     };
     out(a);
 }

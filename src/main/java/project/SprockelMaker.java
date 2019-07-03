@@ -318,10 +318,24 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         visit(ctx.expr(1));
         String result = "Pop regA, \n";
         result += "Pop regB, \n";
-        result += "Compute Mul regA regB regA, \n";
-        result += "Push regA, \n";
+        switch(ctx.multOp().getText()) {
+            case "*":
+                result += "Compute Mul regA regB regA, \n";
+                result += "Push regA, \n";
+                break;
+            case "/":
+                result += "Load (ImmValue 0) regC, \n";
+                result += "Compute GtE regA regB, \n";
+                result += "Branch regA (Rel 2), \n";
+                result += "Jump (Rel 4), \n";
+                result += "Compute Add regC (ImmValue 1) regC, \n";
+                result += "Compute Sub regA regB regA, \n";
+                result += "Jump (Rel (-5), \n";
+                result += "Push regC, \n";
+        }
         prog += result;
         return result;
+
     }
 
     @Override
@@ -332,6 +346,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         result += "Pop regB, \n";
         switch(ctx.plusOp().getText()) {
             case "+":
+            case "➕":
                 result += "Compute Add regA regB regA, \n";
                 break;
             case "-":

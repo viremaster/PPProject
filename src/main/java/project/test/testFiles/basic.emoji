@@ -5,7 +5,7 @@ Program basic;
 	int c = 5;
 	parbegin({
 		lock b;
-		a = a + 10;
+		a = a - 10;
 		unlock b;
 		boolean c = true;
 	});
