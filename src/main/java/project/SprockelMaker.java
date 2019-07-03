@@ -27,7 +27,20 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         this.prog = "";
         this.regCount = 0;
         tree.accept(this);
-        return this.prog;
+        String[] split = this.prog.split("\n");
+        String newprog = "";
+        for(String s:split){
+            newprog += "       " + s + "\n";
+        }
+        newprog =   "import Sprockell\n" +
+                    "\n" +
+                    "prog :: [Instruction]\n" +
+                    "prog = [ \n" + newprog;
+        newprog +=  "       ]\n" +
+                    "\n" +
+                    "main = run [prog]";
+
+        return newprog;
     }
 
     
@@ -282,9 +295,9 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         prog += "Branch regA (Abs ), \n";
         int ins1 = prog.length() - 4;
         prog += "Jump (Abs ), \n";
-        int ins2 = prog.length() - 2;
         int split1 = prog.split("\n").length + 1;
         prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
+        int ins2 = prog.length() - 4;
         varmap.openScope();
         visit(ctx.stat());
         varmap.closeScope();
