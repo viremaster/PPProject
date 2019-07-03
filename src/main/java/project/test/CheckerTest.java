@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @SuppressWarnings("javadoc")
-public class SimpleCheckerTest {
+public class CheckerTest {
 	private final static String ABS_PATH = new File("").getAbsolutePath();
 	private final static String BASE_DIR = "\\src\\src\\main\\java\\project\\test\\testFiles\\";
 	private final static String EXT = ".emoji";
