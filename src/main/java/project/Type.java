@@ -13,17 +13,12 @@ abstract public class Type {
 		return this.kind;
 	}
 
-	abstract public int size();
 
 	static public class Bool extends Type {
 		private Bool() {
 			super(TypeKind.BOOL);
 		}
 
-		@Override
-		public int size() {
-			return 4;
-		}
 
 		@Override
 		public String toString() {
@@ -34,11 +29,6 @@ abstract public class Type {
 	static public class Int extends Type {
 		private Int() {
 			super(TypeKind.INT);
-		}
-
-		@Override
-		public int size() {
-			return 4;
 		}
 
 		@Override

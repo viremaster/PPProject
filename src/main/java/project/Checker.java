@@ -152,16 +152,16 @@ public class Checker extends EmojiLangBaseListener {
 	@Override
 	public void exitIdTarget(EmojiLangParser.IdTargetContext ctx) {
 		String id = ctx.ID().getText();
-		Var var = this.scope.getVar(id);
+		Type var = this.scope.getType(id);
 		if(var == null) {
-			var = this.gscope.getVar(id);
+			var = this.scope.getType(id);
 			if (var == null ) {
 			addError(ctx, "target id type was not yet defined");
 			} else {
-				setType(ctx, var.getType());
+				setType(ctx, var);
 			}
 		} else {
-			setType(ctx, var.getType());
+			setType(ctx, var);
 		}
 
 	}
@@ -217,17 +217,17 @@ public class Checker extends EmojiLangBaseListener {
 	@Override
 	public void exitIdExpr(EmojiLangParser.IdExprContext ctx) {
 		String id = ctx.ID().getText();
-		Var var = this.scope.getVar(id);
+		Type var = this.scope.getType(id);
 		if (var == null) {
-			var = this.gscope.getVar(id);
+			var = this.scope.getType(id);
 			if (var == null) {
 				addError(ctx, "Variable '%s' not declared", id);
 			} else {
-				setType(ctx, var.getType());
+				setType(ctx, var);
 			}
 			
 		} else {
-			setType(ctx, var.getType());
+			setType(ctx, var);
 		}
 	}
 

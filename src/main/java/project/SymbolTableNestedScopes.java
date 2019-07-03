@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 public class SymbolTableNestedScopes{
 
-    Map<Integer , Map<String, Var>> scopemap = new TreeMap<>(Collections.reverseOrder());
+    Map<Integer , Map<String, Type>> scopemap = new TreeMap<>(Collections.reverseOrder());
     Integer currentscope = 0;
     private List<Integer> sizes = new ArrayList<>();
     private int size;
@@ -43,14 +43,13 @@ public class SymbolTableNestedScopes{
         if(contains(id)){
             return false;
         }
-        scopemap.get(currentscope).put(id, new Var(type, size));
-        size += type.size();
+        scopemap.get(currentscope).put(id, type);
         return true;
     }
     
-	public Var getVar(String id) {
+	public Type getType(String id) {
     	System.out.println("get " + id);
-		for( Map<String, Var> s:scopemap.values()){
+		for( Map<String, Type> s:scopemap.values()){
             if(s.containsKey(id)){
                 return s.get(id);
             }
@@ -60,7 +59,7 @@ public class SymbolTableNestedScopes{
 
     public boolean contains(String id) {
     	System.out.println("contains " + id);
-        for( Map<String, Var> s:scopemap.values()){
+        for( Map<String, Type> s:scopemap.values()){
             if(s.containsKey(id)){
                 return true;
             }
