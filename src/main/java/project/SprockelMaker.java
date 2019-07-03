@@ -263,13 +263,13 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
             varmap.closeScope();
         }
         prog += "Jump (Abs ), \n";
-        int ins2 = prog.length() - 2;
         int split1 = prog.split("\n").length + 1;
+        prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
+        int ins2 = prog.length() - 4;
         varmap.openScope();
         visit(ctx.stat(0));
         varmap.closeScope();
         int split2 = prog.split("\n").length + 1;
-        prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
         prog = prog.substring(0, ins2) + (split2) + prog.substring(ins2);
         return null;
     }
@@ -366,21 +366,27 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         result += "Pop regB, \n";
         switch(ctx.compOp().getText()) {
             case "<":
+            case "\u23EA":
                 result += "Compute Lt regA regB regA, \n";
                 break;
             case "<=":
+            case "\u23EE":
                 result += "Compute LtE regA regB regA, \n";
                 break;
             case "==":
+            case "\uD83D\uDD04":
                 result += "Compute Equal regA regB regA, \n";
                 break;
             case ">=":
+            case "⏭":
                 result += "Compute GtE regA regB regA, \n";
                 break;
             case ">":
+            case "⏩":
                 result += "Compute Gt regA regB regA, \n";
                 break;
             case "!=":
+            case "❌\uD83D\uDD04":
                 result += "Compute NEq regA regB regA, \n";
                 break;
         }
@@ -395,11 +401,13 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         visit(ctx.expr(1));
         String result = "Pop regA, \n";
         result += "Pop regB, \n";
-        switch(ctx.boolOp().AND().getText().toLowerCase()) {
+        switch(ctx.boolOp().getText().toLowerCase()) {
             case "and":
+            case "↔":
                 result += "Compute And regA regB regA, \n";
                 break;
             case "or":
+            case "\u23F8":
                 result += "Compute Or regA regB regA, \n";
                 break;
         }

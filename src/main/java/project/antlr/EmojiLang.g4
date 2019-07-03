@@ -66,48 +66,48 @@ type: INT  #intType
 // Keywords
 JOIN:	 J O I N ;
 GLOBAL:  G L O B A L ;
-UNLOCK:  U N L O C K ;
-LOCK: 	 L O C K ;
+UNLOCK:  U N L O C K | '\u{1F513}';
+LOCK: 	 L O C K | '\u{1F512}';
 PARBEGIN:P A R B E G I N ;
 PAREND:  P A R E N D ;
 BOOLEAN: B O O L E A N | '\u{1F313}';
-ELSE:    E L S E ;
+ELSE:    E L S E | '\u21AA';
 END:     E N D ;
 FALSE:   F A L S E | '\u{1F311}';
 IN:      I N ;
 INT: 	 I N T | '\u{1F522}';
-IF:      I F ;
+IF:      I F | '\u{1F500}';
 OUT:     O U T ;
-PROGRAM: P R O G R A M ;
+PROGRAM: P R O G R A M | '\u{1F4BB}';
 TRUE:    T R U E | '\u{1F315}';
-WHILE:   W H I L E ;
+WHILE:   W H I L E | '\u267B';
 
-OR:		'||';
-AND:	'&&';
-NOT:	'!';
+OR:		'||' | '\u23F8';
+AND:	'&&' | '\u2194';
+NOT:	'!' | '\u274c';
 ASS:    '=' | '\u2B05';
 COLON:  ':';
 COMMA:  ',';
 DOT:    '.';
 DQUOTE: '"';
-EQ:     '==';
-GE:     '>=';
-GT:     '>';
-LE:     '<=';
+EQ:     '==' | '\u{1F504}';
+GE:     '>=' | '\u23ED';
+GT:     '>' | '\u23E9';
+LE:     '<=' | '\u23EE';
 LBRACE: '{';
-LPAR:   '(';
-LT:     '<';
+LPAR:   '(' | '\u25C0';
+LT:     '<' | '\u23EA';
 MINUS:  '-' | '\u2796';
-NE:     '!=';
+NE:     '!=' | '\u274c''\u{1F504}';
 PLUS:   '+' | '\u2795';
 RBRACE: '}';
-RPAR:   ')';
+RPAR:   ')' | '\u25B6';
 SEMI:   ';' | '\u{1F6AB}';
 SLASH:  '/';
 STAR:   '*';
 
 // Content-bearing token types
-ID: LETTER (LETTER | DIGIT)*;
+ID: LETTER (LETTER | DIGIT)* | '\u{1F600}'..'\u{1F6AA}' | '\u{1F300}'..'\u{1F500}';
 NUM: DIGIT (DIGIT)*;
 //STR: DQUOTE .*? DQUOTE;
 
