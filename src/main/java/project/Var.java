@@ -14,8 +14,4 @@ public class Var {
 		return type;
 	}
 	
-	public int getOffset() {
-		return offset;
-	}
-	
 }
