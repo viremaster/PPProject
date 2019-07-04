@@ -16,12 +16,13 @@ import java.nio.charset.Charset;
 
 public class SprockelMakerTest {
     private final static String ABS_PATH = new File("").getAbsolutePath();
-    private final static String BASE_DIR_INPUT = "\\src\\main\\java\\project\\test\\testFiles\\";
-    private final static String BASE_DIR_OUTPUT = "\\src\\main\\java\\project\\test\\outputFiles\\";
-    private static SprockelMaker sprockelMaker = new SprockelMaker();
+    private final static String BASE_DIR_INPUT = "\\src\\src\\main\\java\\project\\test\\testFiles\\";
+    private final static String BASE_DIR_OUTPUT = "\\src\\src\\main\\java\\project\\test\\outputFiles\\";
+    private static SprockelMaker sprockelMaker;
 
     public static void main(String[] args) throws IOException, ParseException {
         for(File file : new File(ABS_PATH + BASE_DIR_INPUT).listFiles()) {
+        	sprockelMaker = new SprockelMaker();
             String filename = file.getName();
             filename = filename.substring(0, filename.length()-6);
             ParseTree parsed = parse(filename);

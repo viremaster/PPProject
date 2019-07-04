@@ -38,7 +38,11 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
                     "prog = [ \n" + newprog;
         newprog +=  "       ]\n" +
                     "\n" +
-                    "main = run [prog]";
+                    "main = run [prog";
+        for (int i = 0; i < totalThreads; i++) {
+        	newprog += ", prog";
+        }
+        newprog += "]";
 
         return newprog;
     }
@@ -105,6 +109,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     @Override
     public String visitDeclgvar(EmojiLangParser.DeclgvarContext ctx) {
+    	System.out.println("oof");
     	int size = gvars.keySet().size();
         gvars.put(ctx.ID().getText(), size);
         visit(ctx.expr());
@@ -121,6 +126,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     @Override
     public String visitLockStat(EmojiLangParser.LockStatContext ctx) {
+    	System.out.println("oof");
     	Integer memaddr = 0;
     	String id = ctx.ID().getText();
     	if (gvars.containsKey(id)) {
@@ -149,6 +155,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     @Override
     public String visitParStat(EmojiLangParser.ParStatContext ctx) {
     	
+    	totalThreads++;
     	SymbolTableNestedScopesInteger temp = this.varmap;
     	this.varmap = new SymbolTableNestedScopesInteger();
     	
@@ -175,7 +182,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         prog += "WriteInstr reg0 (DirAddr " + tsl + "), \n";
     	
     	prog += "Jump (Rel  ), \n";
-        int insert2 = prog.length() - 2;
+        int insert2 = prog.length() - 4;
         int split1 = prog.split("\n").length;
         visit(ctx.block());
         
@@ -199,8 +206,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         prog += "EndProg, \n";
         int split2 = prog.split("\n").length;
         
-        prog = prog.substring(0, insert1) + (split1) + prog.substring(insert1, prog.length());
-        prog = prog.substring(0, insert2) + (split2 - split1 + 1) + prog.substring(insert2, prog.length());
+        prog = prog.substring(0, insert1) + (split1) + prog.substring(insert1, insert2) + (split2 - split1 + 1) + prog.substring(insert2, prog.length());
         
     	this.varmap = temp;
         
@@ -268,44 +274,43 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
         visit(ctx.expr());
         prog += "Pop regA, \n";
-        prog += "Branch regA (Abs ), \n";
+        prog += "Branch regA (Rel ), \n";
+        int split0 = prog.split("\n").length;
         int ins1 = prog.length() - 4;
         if(ctx.stat().size() == 2) {
             varmap.openScope();
             visit(ctx.stat(1));
             varmap.closeScope();
         }
-        prog += "Jump (Abs ), \n";
-        int split1 = prog.split("\n").length + 1;
-        prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
+        prog += "Jump (Rel ), \n";
+        int split1 = prog.split("\n").length;
+        prog = prog.substring(0, ins1) + (split1 - split0 + 1) + prog.substring(ins1);
         int ins2 = prog.length() - 4;
         varmap.openScope();
         visit(ctx.stat(0));
         varmap.closeScope();
-        int split2 = prog.split("\n").length + 1;
-        prog = prog.substring(0, ins2) + (split2) + prog.substring(ins2);
+        int split2 = prog.split("\n").length;
+        prog = prog.substring(0, ins2) + (split2 - split1 + 2) + prog.substring(ins2);
         return null;
     }
 
     @Override
     public String visitWhileStat(EmojiLangParser.WhileStatContext ctx) {
-        int split3 = prog.split("\n").length + 1;
+        int split3 = prog.split("\n").length;
         visit(ctx.expr());
         prog += "Pop regA, \n";
-        prog += "Branch regA (Abs ), \n";
-        int ins1 = prog.length() - 4;
-        prog += "Jump (Abs ), \n";
-        int split1 = prog.split("\n").length + 1;
-        prog = prog.substring(0, ins1) + (split1) + prog.substring(ins1);
+        prog += "Branch regA (Rel 2), \n";
+        int split1 = prog.split("\n").length;
+        prog += "Jump (Rel ), \n";
         int ins2 = prog.length() - 4;
         varmap.openScope();
         visit(ctx.stat());
         varmap.closeScope();
-        prog += "Jump (Abs ), \n";
-        int split2 = prog.split("\n").length + 1;
-        prog = prog.substring(0, ins2) + (split2) + prog.substring(ins2);
-        int ins3 = prog.length() - 4;
-        prog = prog.substring(0, ins3) + (split3) + prog.substring(ins3);
+        prog += "Jump (Rel ()), \n";
+        int split2 = prog.split("\n").length;
+        prog = prog.substring(0, ins2) + (split2 - split1) + prog.substring(ins2);
+        int ins3 = prog.length() - 5;
+        prog = prog.substring(0, ins3) + (split3 - split2 + 1) + prog.substring(ins3);
         return null;
     }
 
@@ -355,11 +360,11 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     public String visitPlusExpr(EmojiLangParser.PlusExprContext ctx) {
         visit(ctx.expr(0));
         visit(ctx.expr(1));
-        String result = "Pop regA, \n";
-        result += "Pop regB, \n";
+        String result = "Pop regB, \n";
+        result += "Pop regA, \n";
         switch(ctx.plusOp().getText()) {
             case "+":
-            case "➕":
+            case "âž•":
                 result += "Compute Add regA regB regA, \n";
                 break;
             case "-":
@@ -375,8 +380,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     public String visitCompExpr(EmojiLangParser.CompExprContext ctx) {
         visit(ctx.expr(0));
         visit(ctx.expr(1));
-        String result = "Pop regA, \n";
-        result += "Pop regB, \n";
+        String result = "Pop regB, \n";
+        result += "Pop regA, \n";
         switch(ctx.compOp().getText()) {
             case "<":
             case "\u23EA":
@@ -391,15 +396,15 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
                 result += "Compute Equal regA regB regA, \n";
                 break;
             case ">=":
-            case "⏭":
+            case "â�­":
                 result += "Compute GtE regA regB regA, \n";
                 break;
             case ">":
-            case "⏩":
+            case "â�©":
                 result += "Compute Gt regA regB regA, \n";
                 break;
             case "!=":
-            case "❌\uD83D\uDD04":
+            case "â�Œ\uD83D\uDD04":
                 result += "Compute NEq regA regB regA, \n";
                 break;
         }
@@ -416,7 +421,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         result += "Pop regB, \n";
         switch(ctx.boolOp().getText().toLowerCase()) {
             case "and":
-            case "↔":
+            case "â†”":
                 result += "Compute And regA regB regA, \n";
                 break;
             case "or":
@@ -439,6 +444,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     public String visitIdExpr(EmojiLangParser.IdExprContext ctx) {
     	String result = "";
     	String id = ctx.ID().getText();
+    	System.out.println(gvars.keySet());
     	if (gvars.containsKey(id)) {
         	result += "ReadInstr (DirAddr " + gvars.get(id) + "), \n";
         	result += "Receive regA, \n";

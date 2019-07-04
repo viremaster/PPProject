@@ -56,8 +56,8 @@ prog = [
        Push regA, 
        Load (ImmValue 10) regA, 
        Push regA, 
-       Pop regA, 
        Pop regB, 
+       Pop regA, 
        Compute Sub regA regB regA, 
        Push regA, 
        Pop regA, 
@@ -101,4 +101,4 @@ prog = [
        EndProg
        ]
 
-main = run [prog]
+main = run [prog, prog]
