@@ -1,0 +1,8 @@
+Program notactuallyimportant;
+
+{ 
+	int a = 0;
+	parbegin({
+	a = 5;
+	});
+}

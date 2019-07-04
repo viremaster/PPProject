@@ -127,19 +127,25 @@ public class Checker extends EmojiLangBaseListener {
 	
 	@Override
 	public void exitDeclgvar(EmojiLangParser.DeclgvarContext ctx) {
-		Type type = getType(ctx.type());
-		if(getType(ctx.expr()) != type) {
-			addError(ctx, "assignment type " + type + " does not match " + getType(ctx.expr()));
-		} else if (this.scope.contains(ctx.ID().getText()) || this.gscope.contains(ctx.ID().getText()) || this.lscope.contains(ctx.ID().getText())) {
-			addError(ctx, ctx.ID().getText() + " is already defined.");
+		if (scopestack.empty() && scope.getScope() == 0) {
+			Type type = getType(ctx.type());
+			if(getType(ctx.expr()) != type) {
+				addError(ctx, "assignment type " + type + " does not match " + getType(ctx.expr()));
+			} else if (this.scope.contains(ctx.ID().getText()) || this.gscope.contains(ctx.ID().getText()) || this.lscope.contains(ctx.ID().getText())) {
+				addError(ctx, ctx.ID().getText() + " is already defined.");
+			} else {
+				this.gscope.add(ctx.ID().getText(),type);
+			}
 		} else {
-			this.gscope.add(ctx.ID().getText(),type);
+			addError(ctx, "Global vars can only be declared on top level of main thread");
 		}
 	}
 	
 	@Override
 	public void exitJoinstat(EmojiLangParser.JoinstatContext ctx) {
-		
+		if (!scopestack.empty()) {
+			addError(ctx, "Join can only be used in the main thread");
+		}
 	}
 	
 	@Override
@@ -154,7 +160,7 @@ public class Checker extends EmojiLangBaseListener {
 		String id = ctx.ID().getText();
 		Type var = this.scope.getType(id);
 		if(var == null) {
-			var = this.scope.getType(id);
+			var = this.gscope.getType(id);
 			if (var == null ) {
 			addError(ctx, "target id type was not yet defined");
 			} else {
@@ -271,9 +277,8 @@ public class Checker extends EmojiLangBaseListener {
 	private void checkType(ParserRuleContext node, Type expected) {
 		Type actual = getType(node);
 		if (actual == null) {
-			throw new IllegalArgumentException(node.getText() + " is not assigned");
-		}
-		if (!actual.equals(expected)) {
+			addError(node, node.getText() + " is not assigned");
+		} else if (!actual.equals(expected)) {
 			addError(node, "Expected type '%s' but found '%s'", expected,
 					actual);
 		}

@@ -10,7 +10,7 @@ import java.util.TreeMap;
 public class SymbolTableNestedScopesInteger{
 
     Map<Integer , Map<String, String>> scopemap = new TreeMap<>(Collections.reverseOrder());
-    Integer currentscope = 0;
+    private Integer currentscope = 0;
     private List<Integer> sizes = new ArrayList<>();
     private int size;
 

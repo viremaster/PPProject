@@ -25,27 +25,58 @@ import static org.junit.Assert.fail;
 @SuppressWarnings("javadoc")
 public class CheckerTest {
 	private final static String ABS_PATH = new File("").getAbsolutePath();
-	private final static String BASE_DIR = "\\src\\src\\main\\java\\project\\test\\testFiles\\";
+	private final static String BASE_DIR = "\\src\\src\\main\\java\\project\\test\\TypeCheckertestFiles\\";
 	private final static String EXT = ".emoji";
-	private final Checker checker = new Checker();
 
+	//Scopes inside if and while
 	@Test
-	public void testBasicTypes() throws IOException, ParseException {
-		System.out.println(ABS_PATH);
-		ParseTree tree = parse("basic");
-		Result result = check(tree);
-		System.out.println(tree + " aaa");
-		ParseTree body = tree.getChild(3).getChild(1);
-		ParseTree assX = body;
+	public void IfWhileScopes() throws IOException, ParseException {
+		//Local variables
+		//Creating new variables in threads.
+		check("ThreadsLocalVars1");
+		//Reusing variables in threads.
+		checkFail("ThreadsLocalVars2");
+		
+		//Global variables
+		//Creating new global variables in threads.
+		checkFail("ThreadsGlobalVars1");
+		//Creating new local variable in threads.
+		checkFail("ThreadsGlobalVars2");
+		//Reusing global variables in threads.
+		check("ThreadsGlobalVars3");
 	}
+	
+	
+	//Testing scope lists with threads.
+	@Test
+	public void ThreadScopes() throws IOException, ParseException {
+		//Local variables
+		//Creating new variables in threads.
+		check("ThreadsLocalVars1");
+		//Reusing variables in threads.
+		checkFail("ThreadsLocalVars2");
+		
+		//Global variables
+		//Creating new global variables in threads.
+		checkFail("ThreadsGlobalVars1");
+		//Creating new local variable in threads.
+		checkFail("ThreadsGlobalVars2");
+		//Reusing global variables in threads.
+		check("ThreadsGlobalVars3");
+	}
+	
+
 
 	private void checkFail(String filename) throws IOException {
 		try {
-			check(parse(filename));
+			check(filename);
 			fail(filename + " shouldn't check but did");
 		} catch (ParseException exc) {
-			// this is the expected behaviour
 		}
+	}
+	
+	private void check(String filename) throws ParseException, IOException {
+		new Checker().check(parse(filename));
 	}
 
 	private ParseTree parse(String filename) throws IOException, ParseException {
@@ -54,9 +85,5 @@ public class CheckerTest {
 		EmojiLangParser parser = new EmojiLangParser(tokens);
 		ParseTree result = parser.program();
 		return result;
-	}
-
-	private Result check(ParseTree tree) throws ParseException {
-		return this.checker.check(tree);
 	}
 }

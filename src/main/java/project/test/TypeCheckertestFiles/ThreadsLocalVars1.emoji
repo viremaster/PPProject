@@ -1,0 +1,14 @@
+Program notactuallyimportant;
+
+{ 
+	int a = 0;
+	parbegin({
+		boolean a = false;
+		parbegin({
+			int a = 5;
+			parbegin({
+				boolean a = true;
+			});
+		});
+	});
+}
