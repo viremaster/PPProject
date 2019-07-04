@@ -31,19 +31,22 @@ public class CheckerTest {
 	//Scopes inside if and while
 	@Test
 	public void IfWhileScopes() throws IOException, ParseException {
-		//Local variables
-		//Creating new variables in threads.
-		check("ThreadsLocalVars1");
-		//Reusing variables in threads.
-		checkFail("ThreadsLocalVars2");
+		//Global variables in if statement.
+		check("ifGlobal");
+		//Local variables in if statement.
+		check("ifLocal");
+		//Local variables after statement.
+		checkFail("ifLocalAfter");
 		
-		//Global variables
-		//Creating new global variables in threads.
-		checkFail("ThreadsGlobalVars1");
-		//Creating new local variable in threads.
-		checkFail("ThreadsGlobalVars2");
-		//Reusing global variables in threads.
-		check("ThreadsGlobalVars3");
+		//Check if the else statement is in the same scope as if statement
+		checkFail("ifElseScopes");
+		
+		//Global variables in while loop.
+		check("whileGlobal");
+		//Local variables in while loop.
+		check("whileLocal");
+		//Local variables after while loop.
+		checkFail("whileLocalAfter");
 	}
 	
 	
@@ -55,6 +58,8 @@ public class CheckerTest {
 		check("ThreadsLocalVars1");
 		//Reusing variables in threads.
 		checkFail("ThreadsLocalVars2");
+		//Local var not working anymore after thread.
+		checkFail("ThreadsLocalAfterThread");
 		
 		//Global variables
 		//Creating new global variables in threads.
@@ -63,6 +68,7 @@ public class CheckerTest {
 		checkFail("ThreadsGlobalVars2");
 		//Reusing global variables in threads.
 		check("ThreadsGlobalVars3");
+		
 	}
 	
 

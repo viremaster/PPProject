@@ -1,0 +1,8 @@
+Program notactuallyimportant;
+
+{ 
+	int a = 0;
+	if (a == 0) {
+		a = 5;
+	};
+}

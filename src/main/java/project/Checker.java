@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 
 public class Checker extends EmojiLangBaseListener {
@@ -80,6 +81,13 @@ public class Checker extends EmojiLangBaseListener {
 	public void exitIfStat(EmojiLangParser.IfStatContext ctx) {
 		checkType(ctx.expr(), Type.BOOL);
 		this.scope.closeScope();
+	}
+	
+	@Override public void visitTerminal(TerminalNode node) { 
+		if (node.getText().toLowerCase().equals("else")) {
+			this.scope.closeScope();
+			this.scope.openScope();
+		}
 	}
 	
 	@Override
@@ -225,7 +233,7 @@ public class Checker extends EmojiLangBaseListener {
 		String id = ctx.ID().getText();
 		Type var = this.scope.getType(id);
 		if (var == null) {
-			var = this.scope.getType(id);
+			var = this.gscope.getType(id);
 			if (var == null) {
 				addError(ctx, "Variable '%s' not declared", id);
 			} else {
