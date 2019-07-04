@@ -1,28 +1,23 @@
 package main.java.project.test;
 
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 
-import main.java.project.antlr.EmojiLangLexer;
-import main.java.project.antlr.EmojiLangParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-
 import org.junit.Test;
 
 import main.java.project.Checker;
 import main.java.project.ParseException;
-import main.java.project.Result;
-import main.java.project.Type;
+import main.java.project.antlr.EmojiLangLexer;
+import main.java.project.antlr.EmojiLangParser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-@SuppressWarnings("javadoc")
 public class CheckerTest {
 	private final static String ABS_PATH = new File("").getAbsolutePath();
 	private final static String BASE_DIR = "\\src\\src\\main\\java\\project\\test\\TypeCheckertestFiles\\";
