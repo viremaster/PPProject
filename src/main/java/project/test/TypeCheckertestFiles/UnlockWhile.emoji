@@ -1,0 +1,8 @@
+Program notactuallyimportant;
+
+{ 
+	while (0 == 0) {
+	lock a;
+	};
+	unlock a;
+}

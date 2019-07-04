@@ -1,0 +1,6 @@
+Program notactuallyimportant;
+
+{ 
+	lock a;
+	global int a = 0;
+}

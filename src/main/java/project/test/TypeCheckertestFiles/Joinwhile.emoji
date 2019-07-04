@@ -1,0 +1,7 @@
+Program notactuallyimportant;
+
+{ 
+	while (1 == 1) {
+		join;
+	};
+}

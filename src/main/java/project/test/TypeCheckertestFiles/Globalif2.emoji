@@ -1,0 +1,7 @@
+Program notactuallyimportant;
+
+{ 
+	if (4 == 0) {
+		global int a = 0;
+	};
+}

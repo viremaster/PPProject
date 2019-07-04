@@ -1,0 +1,7 @@
+Program notactuallyimportant;
+
+{
+	unlock a; 
+	lock a;
+
+}

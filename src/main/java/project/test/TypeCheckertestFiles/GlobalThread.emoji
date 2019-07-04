@@ -1,0 +1,7 @@
+Program notactuallyimportant;
+
+{ 
+	parbegin({
+	global int a = 0;
+	});
+}
