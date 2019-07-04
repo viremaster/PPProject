@@ -1,16 +1,12 @@
-Program whiletest;
+Program whileTest;
 
 {
     int a = 2;
-    out(a);
-    while(a < 3){
+    while(a < 12){
         a = a + 1;
-        out(a);
     };
-    out(a);
     while(a > 0){
         a = a - 1;
-        out(a);
     };
     out(a);
 }

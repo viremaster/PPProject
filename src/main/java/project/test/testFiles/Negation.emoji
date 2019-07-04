@@ -1,0 +1,9 @@
+Program Negation;
+
+{
+int a = -3;
+out(a);
+
+boolean b = false;
+out(!b);
+}

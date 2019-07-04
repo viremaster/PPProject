@@ -1,0 +1,16 @@
+Program Banking;
+
+{
+    global int a = 0;
+    parbegin({
+        lock b;
+        a = a - 7;
+        unlock b;
+    });
+    parbegin({
+        lock b;
+        a = a + 6;
+        unlock b;
+    });
+    out(a);
+}

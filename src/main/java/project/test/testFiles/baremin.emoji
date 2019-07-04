@@ -1,6 +1,0 @@
-Program help;
-
-{
-    int a = 0;
-    out(a);
-}

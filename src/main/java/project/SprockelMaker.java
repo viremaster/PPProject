@@ -56,44 +56,45 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     	int trl = gvars.get("threadrunnerlock");
     	int ttl = gvars.get("threadtargetlock");
     	int tc = gvars.get("threadcounter");
-    	
-    	prog += "Compute Equal regSprID reg0 regB, \n";
-    	prog += "Branch regB (Rel 21), \n";
-
-    	prog += "TestAndSet (DirAddr " + trl + "), \n";
-    	prog += "Receive regA, \n";
-    	prog += "Compute Equal regA reg0 regB, \n";
-        prog += "Branch regB (Rel (-3)), \n";
-        
-        // increase thread counter
-        
-        prog += "ReadInstr (DirAddr " + tc + "), \n";
-        prog += "Receive regA, \n";
-        prog += "Load (ImmValue 1) regB, \n";
-        prog += "Compute Add regA regB regA, \n";
-        prog += "WriteInstr regA (DirAddr " + tc + "), \n";
-        prog += "ReadInstr (DirAddr " + tc + "), \n";
-        prog += "Receive regB, \n";
-        prog += "Compute NEq regA regB regC, \n";
-        prog += "Branch regC (Rel (-4)), \n";
-        
-    	// settarget
-        
-        prog += "ReadInstr (DirAddr " + ttl + "), \n";
-    	prog += "Receive regA, \n";
-    	prog += "Compute Equal regA reg0 regB, \n";
-        prog += "Branch regB (Rel (-3)), \n";
-        prog += "WriteInstr reg0 (DirAddr " + ttl + "), \n";
-        
-    	// unlock
-        prog += "WriteInstr reg0 (DirAddr " + trl + "), \n";
-        
-        // jump
-        
-        prog += "Jump (Ind regA), \n";
-        
-    	
         visit(ctx.block());
+    	if(totalThreads != 0) {
+            String newprog = "Compute Equal regSprID reg0 regB, \n";
+            newprog += "Branch regB (Rel 21), \n";
+
+            newprog += "TestAndSet (DirAddr " + trl + "), \n";
+            newprog += "Receive regA, \n";
+            newprog += "Compute Equal regA reg0 regB, \n";
+            newprog += "Branch regB (Rel (-3)), \n";
+
+            // increase thread counter
+
+            newprog += "ReadInstr (DirAddr " + tc + "), \n";
+            newprog += "Receive regA, \n";
+            newprog += "Load (ImmValue 1) regB, \n";
+            newprog += "Compute Add regA regB regA, \n";
+            newprog += "WriteInstr regA (DirAddr " + tc + "), \n";
+            newprog += "ReadInstr (DirAddr " + tc + "), \n";
+            newprog += "Receive regB, \n";
+            newprog += "Compute NEq regA regB regC, \n";
+            newprog += "Branch regC (Rel (-4)), \n";
+
+            // settarget
+
+            newprog += "ReadInstr (DirAddr " + ttl + "), \n";
+            newprog += "Receive regA, \n";
+            newprog += "Compute Equal regA reg0 regB, \n";
+            newprog += "Branch regB (Rel (-3)), \n";
+            newprog += "WriteInstr reg0 (DirAddr " + ttl + "), \n";
+
+            // unlock
+            newprog += "WriteInstr reg0 (DirAddr " + trl + "), \n";
+
+            // jump
+
+            newprog += "Jump (Ind regA), \n";
+
+            prog = newprog + prog;
+        }
         prog += "EndProg";
         return null;
     }
@@ -109,7 +110,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     @Override
     public String visitDeclgvar(EmojiLangParser.DeclgvarContext ctx) {
-    	System.out.println("oof");
     	int size = gvars.keySet().size();
         gvars.put(ctx.ID().getText(), size);
         visit(ctx.expr());
@@ -126,7 +126,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     @Override
     public String visitLockStat(EmojiLangParser.LockStatContext ctx) {
-    	System.out.println("oof");
     	Integer memaddr = 0;
     	String id = ctx.ID().getText();
     	if (gvars.containsKey(id)) {
@@ -202,11 +201,10 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         prog += "Branch regC (Rel (-4)), \n";
         
         prog += "WriteInstr reg0 (DirAddr " + trl + "), \n";
-        
-        prog += "EndProg, \n";
+
         int split2 = prog.split("\n").length;
         
-        prog = prog.substring(0, insert1) + (split1) + prog.substring(insert1, insert2) + (split2 - split1 + 1) + prog.substring(insert2, prog.length());
+        prog = prog.substring(0, insert1) + (split1 + 22) + prog.substring(insert1, insert2) + (split2 - split1 + 1) + prog.substring(insert2, prog.length());
         
     	this.varmap = temp;
         
@@ -290,7 +288,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         visit(ctx.stat(0));
         varmap.closeScope();
         int split2 = prog.split("\n").length;
-        prog = prog.substring(0, ins2) + (split2 - split1 + 2) + prog.substring(ins2);
+        prog = prog.substring(0, ins2) + (split2 - split1 + 1) + prog.substring(ins2);
         return null;
     }
 
@@ -318,8 +316,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     public String visitPrfExpr(EmojiLangParser.PrfExprContext ctx) {
         visit(ctx.expr());
         String result = "Pop regA, \n";
-        if(ctx.prfOp().getText().equals("-")){
-            result += "Load (ImmValue -1) regB, \n";
+        if(ctx.prfOp().getText().equals("-") || ctx.prfOp().getText().equals("➖")){
+            result += "Load (ImmValue (-1)) regB, \n";
             result += "Compute Mul regA regB regA, \n";
         } else {
             result += "Load (ImmValue 1) regB, \n";
@@ -334,8 +332,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     public String visitMultExpr(EmojiLangParser.MultExprContext ctx) {
         visit(ctx.expr(0));
         visit(ctx.expr(1));
-        String result = "Pop regA, \n";
-        result += "Pop regB, \n";
+        String result = "Pop regB, \n";
+        result += "Pop regA, \n";
         switch(ctx.multOp().getText()) {
             case "*":
                 result += "Compute Mul regA regB regA, \n";
@@ -343,12 +341,53 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
                 break;
             case "/":
                 result += "Load (ImmValue 0) regC, \n";
-                result += "Compute GtE regA regB, \n";
+                result += "Compute Lt regA reg0 regE, \n";
+                result += "Compute Lt regB reg0 regF, \n";
+                result += "Branch regE (Rel 3), \n";
+                result += "Branch regF (Rel 14), \n";
+                result += "Jump (Rel 27),\n";
+                result += "Branch regF (Rel 23), \n";
+
+                //case for A negative
+                result += "Load (ImmValue (-1)) regE, \n";
+                result += "Compute Mul regA regE regA, \n";
+                result += "Compute GtE regA regB regA, \n";
                 result += "Branch regA (Rel 2), \n";
-                result += "Jump (Rel 4), \n";
-                result += "Compute Add regC (ImmValue 1) regC, \n";
+                result += "Jump (Rel 5), \n";
+                result += "Load (ImmValue 1) regD, \n";
+                result += "Compute Add regC regD regC, \n";
                 result += "Compute Sub regA regB regA, \n";
-                result += "Jump (Rel (-5), \n";
+                result += "Jump (Rel (-6)), \n";
+                result += "Compute Mul regC regE regC, \n";
+                result += "Jump (Rel 22), \n";
+
+                //case for B negative
+                result += "Load (ImmValue (-1)) regE, \n";
+                result += "Compute Mul regB regE regB, \n";
+                result += "Compute GtE regA regB regA, \n";
+                result += "Branch regA (Rel 2), \n";
+                result += "Jump (Rel 5), \n";
+                result += "Load (ImmValue 1) regD, \n";
+                result += "Compute Add regC regD regC, \n";
+                result += "Compute Sub regA regB regA, \n";
+                result += "Jump (Rel (-6)), \n";
+                result += "Compute Mul regC regE regC, \n";
+                result += "Jump (Rel 11), \n";
+
+                //case for two negative
+                result += "Load (ImmValue (-1)) regE, \n";
+                result += "Compute Mul regB regE regB, \n";
+                result += "Compute Mul regA regE regA, \n";
+
+
+                //case for two positive
+                result += "Compute GtE regA regB regA, \n";
+                result += "Branch regA (Rel 2), \n";
+                result += "Jump (Rel 5), \n";
+                result += "Load (ImmValue 1) regD, \n";
+                result += "Compute Add regC regD regC, \n";
+                result += "Compute Sub regA regB regA, \n";
+                result += "Jump (Rel (-6)), \n";
                 result += "Push regC, \n";
         }
         prog += result;
@@ -364,10 +403,11 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         result += "Pop regA, \n";
         switch(ctx.plusOp().getText()) {
             case "+":
-            case "âž•":
+            case "➕":
                 result += "Compute Add regA regB regA, \n";
                 break;
             case "-":
+            case "➖":
                 result += "Compute Sub regA regB regA, \n";
                 break;
         }
@@ -384,7 +424,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         result += "Pop regA, \n";
         switch(ctx.compOp().getText()) {
             case "<":
-            case "\u23EA":
+            case "⏪":
                 result += "Compute Lt regA regB regA, \n";
                 break;
             case "<=":
@@ -396,15 +436,15 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
                 result += "Compute Equal regA regB regA, \n";
                 break;
             case ">=":
-            case "â�­":
+            case "⏭":
                 result += "Compute GtE regA regB regA, \n";
                 break;
             case ">":
-            case "â�©":
+            case "⏩":
                 result += "Compute Gt regA regB regA, \n";
                 break;
             case "!=":
-            case "â�Œ\uD83D\uDD04":
+            case "❌\uD83D\uDD04":
                 result += "Compute NEq regA regB regA, \n";
                 break;
         }
@@ -444,7 +484,6 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     public String visitIdExpr(EmojiLangParser.IdExprContext ctx) {
     	String result = "";
     	String id = ctx.ID().getText();
-    	System.out.println(gvars.keySet());
     	if (gvars.containsKey(id)) {
         	result += "ReadInstr (DirAddr " + gvars.get(id) + "), \n";
         	result += "Receive regA, \n";

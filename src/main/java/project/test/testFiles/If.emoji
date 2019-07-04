@@ -1,0 +1,13 @@
+Program ifTest;
+
+{
+    int a = 4;
+    if (a < 3){
+        a = a - 1;
+    } else if(a == 3){
+        a = a - 3;
+    } else {
+        a = a - 7;
+    };
+    out(a);
+}
