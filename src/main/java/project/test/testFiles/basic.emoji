@@ -11,5 +11,6 @@ Program basic;
 	});
 	c = 8;
 	join;
+	out(c);
 	out(a);
 }

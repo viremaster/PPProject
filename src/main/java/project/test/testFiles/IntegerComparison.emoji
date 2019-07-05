@@ -1,0 +1,12 @@
+Program IntegerComparison;
+
+{
+ int c = 2;
+ int d = 3;
+ out(c < d);
+ out(c > d);
+ out (c == d);
+ out(c <= d);
+ out(c >= d);
+ out(!(c == d));
+}

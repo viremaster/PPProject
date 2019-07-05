@@ -1,24 +1,8 @@
 Program BooleanBinary;
 
 {
- int c = 2;
- int d = 3;
-
- boolean b = d < c;
- out(b);
-
- b = d > c;
- out(b);
-
- b = d == c;
- out(b);
-
- b = d <= c;
- out(b);
-
- b = d >= c;
- out(b);
-
- b = !(d == c);
- out(b);
+    boolean a = true;
+    boolean b = false;
+    out(a || b);
+    out(a && b);
 }
