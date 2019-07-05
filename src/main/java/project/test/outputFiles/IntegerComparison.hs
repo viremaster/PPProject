@@ -77,4 +77,4 @@ prog = [
        EndProg
        ]
 
-main = runWithDebugger(debuggerSimplePrintAndWait myShow) [prog]
+main = run [prog]
