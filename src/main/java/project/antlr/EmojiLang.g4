@@ -7,7 +7,7 @@ program
 
 /** Grouped sequence of statements. */
 block
-    : LBRACE (stat SEMI)+ RBRACE
+    : LBRACE (stat SEMI)* RBRACE
     ;
 
 /** Statement. */
@@ -78,7 +78,7 @@ IN:      I N ;
 INT: 	 I N T | '\u1F522';
 IF:      I F | '\u1F500';
 OUT:     O U T ;
-PROGRAM: P R O G R A M | '\u1F4BB';
+PROGRAM: P R O G R A M | '\u{1F4BB}';
 TRUE:    T R U E | '\u1F315';
 WHILE:   W H I L E | '\u267B';
 

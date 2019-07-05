@@ -102,7 +102,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         prog += "EndProg";
         return null;
     }
-    
+
+    //When joining the thread waits for the lock to release and then continues.
     @Override
     public String visitJoinstat(EmojiLangParser.JoinstatContext ctx) {
     	String result = "ReadInstr (DirAddr " + gvars.get("threadcounter") + "), \n";
@@ -112,6 +113,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     	return result;
     }
 
+    //When a global variable is declared it will be set and tested,
+    //when it is not set correctly it will try again until it has been set properly
     @Override
     public String visitDeclgvar(EmojiLangParser.DeclgvarContext ctx) {
     	int size = gvars.keySet().size();
@@ -128,6 +131,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     
     }
 
+    //When a lock is made we see if the lock already exists, if it does we try and set it until we succeed.
+    //if it doesn't we make it and set it.
     @Override
     public String visitLockStat(EmojiLangParser.LockStatContext ctx) {
     	Integer memaddr = 0;
@@ -146,7 +151,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 		return result;
     
     }
-    
+
+    //When we unlock we set the address of the lock to unlocked.
     @Override
     public String visitUnlockStat(EmojiLangParser.UnlockStatContext ctx) {
     	String result = "WriteInstr reg0 (DirAddr " + gvars.get(ctx.ID().getText()) + "), \n";
@@ -154,7 +160,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 		return result;
     
     }
-    
+
+    //When the parallel segment is visited we lock until the main thread arrives.
     @Override
     public String visitParStat(EmojiLangParser.ParStatContext ctx) {
     	
@@ -217,9 +224,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 		return prog;
     
     }
-    
-    //End Concurrency
-    
+
+    // When a variable is declared it will be add to the Symboltable
     @Override
     public String visitDeclvar(EmojiLangParser.DeclvarContext ctx) {
     	String address = "(DirAddr " + regCount + ")";
@@ -232,6 +238,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    // When an assignment is done we check if it is a global variable, if it is we try to change it until we succeed,
+    // otherwise we change the local variable.
     @Override
     public String visitAssStat(EmojiLangParser.AssStatContext ctx) {
         visit(ctx.expr());
@@ -252,6 +260,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    // Out returns the value in a register to the output
     @Override
     public String visitOutStat(EmojiLangParser.OutStatContext ctx) {
         visit(ctx.expr());
@@ -260,11 +269,13 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return null;
     }
 
+    // The blockstat visits the block
     @Override
     public String visitBlockStat(EmojiLangParser.BlockStatContext ctx) {
         return visit(ctx.block());
     }
 
+    // Block visits all statements in the block
     @Override
     public String visitBlock(EmojiLangParser.BlockContext ctx) {
         for(EmojiLangParser.StatContext st:ctx.stat()){
@@ -273,6 +284,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return null;
     }
 
+    //The if loop is restructured so that we put the else first and jump over it if the expression is true
     @Override
     public String visitIfStat(EmojiLangParser.IfStatContext ctx) {
 
@@ -298,6 +310,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return null;
     }
 
+    //The expression is visited and then we end the loop if the expression is false or we
+    // go into the stat if the expression is true, afterwards we jump back to the expression
     @Override
     public String visitWhileStat(EmojiLangParser.WhileStatContext ctx) {
         int split3 = prog.split("\n").length;
@@ -318,6 +332,8 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return null;
     }
 
+    //The PrfExpr checks wether we are dealing with a negative number or a boolean situation,
+    //changing the value accordingly
     @Override
     public String visitPrfExpr(EmojiLangParser.PrfExprContext ctx) {
         visit(ctx.expr());
@@ -334,6 +350,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    //Visits the two expressions and multiplies them or does a soft integer division
     @Override
     public String visitMultExpr(EmojiLangParser.MultExprContext ctx) {
         visit(ctx.expr(0));
@@ -401,6 +418,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
     }
 
+    //Visits the two expressions and adds them or subtracts them
     @Override
     public String visitPlusExpr(EmojiLangParser.PlusExprContext ctx) {
         visit(ctx.expr(0));
@@ -422,6 +440,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    //Visits the two expressions and does the boolean comparison on them
     @Override
     public String visitCompExpr(EmojiLangParser.CompExprContext ctx) {
         visit(ctx.expr(0));
@@ -459,6 +478,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    //Visits the two expressions and ands them or ors them
     @Override
     public String visitBoolExpr(EmojiLangParser.BoolExprContext ctx) {
         visit(ctx.expr(0));
@@ -467,7 +487,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         result += "Pop regB, \n";
         switch(ctx.boolOp().getText().toLowerCase()) {
             case "&&":
-            case "â†”":
+            case "\u2194":
                 result += "Compute And regA regB regA, \n";
                 break;
             case "||":
@@ -480,12 +500,14 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    //Visits the expression in between parentheses
     @Override
     public String visitParExpr(EmojiLangParser.ParExprContext ctx) {
         visit(ctx.expr());
         return null;
     }
 
+    //Takes the value of stored position of the id out of the varmap and loads the value that is in there
     @Override
     public String visitIdExpr(EmojiLangParser.IdExprContext ctx) {
     	String result = "";
@@ -502,6 +524,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    //Loads the number that is visited
     @Override
     public String visitNumExpr(EmojiLangParser.NumExprContext ctx) {
         String result = "Load (ImmValue " + Integer.parseInt(ctx.NUM().getText()) + ") regA, \n";
@@ -510,6 +533,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    //Loads the value true
     @Override
     public String visitTrueExpr(EmojiLangParser.TrueExprContext ctx) {
         String result = "Load (ImmValue 1) regA, \n";
@@ -518,6 +542,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         return result;
     }
 
+    //Loads the value false
     @Override
     public String visitFalseExpr(EmojiLangParser.FalseExprContext ctx) {
         String result = "Load (ImmValue 0) regA, \n";

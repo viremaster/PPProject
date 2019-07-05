@@ -8,7 +8,6 @@ parbegin({
     flag0 = true;
     turn = 1;
     while(flag1 == true && turn == 1){
-    int nop = 0;
     };
     out(turn);
     flag0 = false;
@@ -17,7 +16,6 @@ parbegin({
     flag1 = true;
     turn = 0;
     while(flag0 == true && turn == 0){
-    int nop = 0;
     };
     out(turn);
     flag1 = false;
