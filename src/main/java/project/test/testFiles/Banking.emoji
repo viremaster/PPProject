@@ -12,5 +12,6 @@ Program Banking;
         a = a + 6;
         unlock b;
     });
+    join;
     out(a);
 }
