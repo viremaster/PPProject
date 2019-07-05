@@ -8,17 +8,22 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class SprockelMaker extends EmojiLangBaseVisitor<String> {
 
+    //The String that stores the program
     private String prog;
 
+    //The integer keeping count of the registers
     private int regCount;
 
+    //The SymbolTable that keeps track of all variables in the scopes.
     private SymbolTableNestedScopesInteger varmap = new SymbolTableNestedScopesInteger();
-    
+
+    //The map that keeps track of all global variables.
     private Map<String, Integer> gvars = new HashMap<>();
    
-    
+    //The integer storing how many Threads are used in this code.
     private int totalThreads = 0;
-    
+
+    //Calling this function will generate the corresponding Sprockel code of a parsetree
     public String generate(ParseTree tree) {
         gvars.put("threadstarterlock", 0);
         gvars.put("threadrunnerlock", 1);
@@ -48,8 +53,7 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
     }
 
     
-    //Concurrency
-
+    //When visiting a program first the setup is done for concurrency, making the code that makes the threads visit different parts of the code.
     @Override
     public String visitProgram(EmojiLangParser.ProgramContext ctx) {
     	

@@ -15,11 +15,16 @@ import java.nio.charset.Charset;
 
 
 public class SprockelMakerTest {
+    //The variables to describe the paths of the input and output folder.
     private final static String ABS_PATH = new File("").getAbsolutePath();
     private final static String BASE_DIR_INPUT = "\\src\\main\\java\\project\\test\\testFiles\\";
     private final static String BASE_DIR_OUTPUT = "\\src\\main\\java\\project\\test\\outputFiles\\";
+
+    //The object that turns parseTrees into sprockel code.
     private static SprockelMaker sprockelMaker;
 
+    //When run this function parses all the files in the folder "testFiles"
+    //and then creates the corresponding .hs files of these files in the folder "outputFiles"
     public static void main(String[] args) throws IOException, ParseException {
         for(File file : new File(ABS_PATH + BASE_DIR_INPUT).listFiles()) {
         	sprockelMaker = new SprockelMaker();
@@ -34,10 +39,11 @@ public class SprockelMakerTest {
             fos.flush();
             fos.close();
             System.out.println("Test \"" + filename + "\" files generated successfully");
-            //ProcessBuilder.startPipeline();
+
         }
     }
 
+    //This function creates the Parsetree from a given filename using the EmojiLangParser
     private static ParseTree parse(String filename) throws IOException, ParseException {
         CharStream s = CharStreams.fromFileName(ABS_PATH + BASE_DIR_INPUT + filename + ".emoji", Charset.forName("utf-8"));
         Lexer lexer = new EmojiLangLexer(s);
