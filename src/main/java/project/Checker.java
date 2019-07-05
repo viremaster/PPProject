@@ -40,21 +40,9 @@ public class Checker extends EmojiLangBaseListener {
 		return this.result;
 	}
 
-	//Program
-	
-	@Override
-	public void exitProgram(EmojiLangParser.ProgramContext ctx) {
-
-	}
-	
-	//Block
-	
-	@Override
-	public void exitBlock(EmojiLangParser.BlockContext ctx) {
-	}
-
 	//Stat
 	
+	//Puts a new variable in scope if there isn't already a variable with that name and checks if the declared type equal the type of the expression.
 	@Override
 	public void exitDeclvar(EmojiLangParser.DeclvarContext ctx) {
 		Type type = getType(ctx.type());
@@ -67,22 +55,26 @@ public class Checker extends EmojiLangBaseListener {
 		}
 	}
 	
+	//Checks if the type of the targer is the same as the type of the expression.
 	@Override
 	public void exitAssStat(EmojiLangParser.AssStatContext ctx) {
 		checkType(ctx.target(), getType(ctx.expr()));
 	}
 	
+	//Entering an if statement opens a new scope.
 	@Override
 	public void enterIfStat(EmojiLangParser.IfStatContext ctx) {
 		this.scope.openScope();
 	}
 	
+	//Exiting an if statement closes the scope that was opened upon entering the if statement.
 	@Override
 	public void exitIfStat(EmojiLangParser.IfStatContext ctx) {
 		checkType(ctx.expr(), Type.BOOL);
 		this.scope.closeScope();
 	}
 	
+	//if an else is present in the if statement the current scope has to be closed and a new scope has to be opened for the else part.
 	@Override public void visitTerminal(TerminalNode node) { 
 		if (node.getText().toLowerCase().equals("else")) {
 			this.scope.closeScope();
@@ -90,11 +82,13 @@ public class Checker extends EmojiLangBaseListener {
 		}
 	}
 	
+	//Starting a while loop opens a new scope.
 	@Override
 	public void enterWhileStat(EmojiLangParser.WhileStatContext ctx) {
 		this.scope.openScope();
 	}
 	
+	//Exiting a while loop closes the scope that was opened upon entering the while loop.
 	@Override
 	public void exitWhileStat(EmojiLangParser.WhileStatContext ctx) {
 		checkType(ctx.expr(), Type.BOOL);
