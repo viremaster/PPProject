@@ -11,6 +11,7 @@ parbegin({
     int nop = 0;
     };
     out(turn);
+    out(5);
     flag0 = false;
 });
 parbegin({
@@ -20,6 +21,7 @@ parbegin({
     int nop = 0;
     };
     out(turn);
+    out(6);
     flag1 = false;
 });
 }

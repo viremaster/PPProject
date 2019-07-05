@@ -201,7 +201,9 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         prog += "Branch regC (Rel (-4)), \n";
         
         prog += "WriteInstr reg0 (DirAddr " + trl + "), \n";
-
+        prog += "EndProg, \n";
+        
+        
         int split2 = prog.split("\n").length;
         
         prog = prog.substring(0, insert1) + (split1 + 22) + prog.substring(insert1, insert2) + (split2 - split1 + 1) + prog.substring(insert2, prog.length());
@@ -460,11 +462,11 @@ public class SprockelMaker extends EmojiLangBaseVisitor<String> {
         String result = "Pop regA, \n";
         result += "Pop regB, \n";
         switch(ctx.boolOp().getText().toLowerCase()) {
-            case "and":
+            case "&&":
             case "â†”":
                 result += "Compute And regA regB regA, \n";
                 break;
-            case "or":
+            case "||":
             case "\u23F8":
                 result += "Compute Or regA regB regA, \n";
                 break;
