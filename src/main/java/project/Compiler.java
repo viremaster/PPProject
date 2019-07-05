@@ -1,36 +1,45 @@
-package main.java.project.test;
-
-import main.java.project.ParseException;
-import main.java.project.SprockelMaker;
-import main.java.project.antlr.EmojiLangLexer;
-import main.java.project.antlr.EmojiLangParser;
-
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
+package main.java.project;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 
-public class SprockelMakerTest {
+import main.java.project.antlr.EmojiLangLexer;
+import main.java.project.antlr.EmojiLangParser;
+
+public class Compiler {
+
     //The variables to describe the paths of the input and output folder.
     private final static String ABS_PATH = new File("").getAbsolutePath();
-    private final static String BASE_DIR_INPUT = "\\src\\main\\java\\project\\test\\testFiles\\";
-    private final static String BASE_DIR_OUTPUT = "\\src\\main\\java\\project\\test\\outputFiles\\";
+    private final static String BASE_DIR_INPUT = "\\src\\src\\main\\java\\project\\Compiler\\";
+    private final static String BASE_DIR_OUTPUT = "\\src\\src\\main\\java\\project\\Compilerout\\";
 
     //The object that turns parseTrees into sprockell code.
+    private static Checker checker;
     private static SprockelMaker sprockelMaker;
 
     //When run this function parses all the files in the folder "testFiles"
     //and then creates the corresponding .hs files of these files in the folder "outputFiles"
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) {
         for(File file : new File(ABS_PATH + BASE_DIR_INPUT).listFiles()) {
+        	try {
         	sprockelMaker = new SprockelMaker();
+        	checker = new Checker();
             String filename = file.getName();
             filename = filename.substring(0, filename.length()-6);
+        	System.out.println("Parsing: \"" + filename + "\"");
             ParseTree parsed = parse(filename);
+           	System.out.println("Type Checking: \"" + filename + "\"");
+            checker.check(parsed);
+           	System.out.println("Generating code: \"" + filename + "\"");
             String generated = sprockelMaker.generate(parsed);
             File output = new File(ABS_PATH + BASE_DIR_OUTPUT + filename + ".hs");
             output.createNewFile();
@@ -38,8 +47,12 @@ public class SprockelMakerTest {
             fos.write(generated.getBytes());
             fos.flush();
             fos.close();
-            System.out.println("Test \"" + filename + "\" files generated successfully");
-
+            System.out.println("\"" + filename + "\" generated successfully");
+        	} catch (ParseException e) {
+        		e.print();
+        	} catch (IOException e) {
+        		e.printStackTrace();
+        	}
         }
     }
 
@@ -52,5 +65,5 @@ public class SprockelMakerTest {
         ParseTree result = parser.program();
         return result;
     }
-
+	
 }
