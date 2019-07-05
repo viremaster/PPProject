@@ -1,5 +1,7 @@
 package main.java.project;
 
+//Stores information about the types.
+
 abstract public class Type {
 	public static final Type BOOL = new Bool();
 	public static final Type INT = new Int();

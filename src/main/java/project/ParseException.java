@@ -2,6 +2,8 @@ package main.java.project;
 
 import java.util.List;
 
+//Simple Exception class reused from exercises. Receives list of errors and prints them all.
+
 /** Exception class wrapping a list of error messages. */
 public class ParseException extends Exception {
 	private final List<String> messages;

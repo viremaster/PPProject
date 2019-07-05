@@ -9,12 +9,13 @@ import main.java.project.antlr.EmojiLangParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 
 public class Checker extends EmojiLangBaseListener {
-	private Result result;
+
 
 	//Stack for scopes for threads
 	Stack<SymbolTableNestedScopes> scopestack = new Stack<>();
@@ -26,23 +27,24 @@ public class Checker extends EmojiLangBaseListener {
 
 	//List of errors
 	private List<String> errors;
+	
+	//Types
+	private final ParseTreeProperty<Type> types = new ParseTreeProperty<>();
 
-	public Result check(ParseTree tree) throws ParseException {
+	public void check(ParseTree tree) throws ParseException {
 		this.scope = new SymbolTableNestedScopes();
 		this.gscope = new SymbolTableNestedScopes();
 		this.lscope = new SymbolTableNestedScopes();
-		this.result = new Result();
 		this.errors = new ArrayList<>();
 		new ParseTreeWalker().walk(this, tree);
-		if (hasErrors()) {
-			throw new ParseException(getErrors());
+		if (!errors.isEmpty()) {
+			throw new ParseException(this.errors);
 		}
-		return this.result;
 	}
 
 	//Stat
 	
-	//Puts a new variable in scope if there isn't already a variable with that name and checks if the declared type equal the type of the expression.
+	//Puts a new variable in scope if there isn't already a variable with that name in scope gscope or lscop and checks if the declared type equal the type of the expression.
 	@Override
 	public void exitDeclvar(EmojiLangParser.DeclvarContext ctx) {
 		Type type = getType(ctx.type());
@@ -96,21 +98,20 @@ public class Checker extends EmojiLangBaseListener {
 		
 	}
 	
-	@Override
-	public void exitBlockStat(EmojiLangParser.BlockStatContext ctx) {
-	}
-	
+	//Entering a par statement creates an entire new scope and stores te previous one in a stack.
 	@Override
 	public void enterParStat(EmojiLangParser.ParStatContext ctx) {
 		scopestack.push(scope);
 		scope = new SymbolTableNestedScopes();
 	}
 	
+	//Exiting a par statement pops a scope from the stack and puts it as the scope.
 	@Override
 	public void exitParStat(EmojiLangParser.ParStatContext ctx) {
 		scope = scopestack.pop();
 	}
 	
+	//Puts a variable in lscope if it is not already in scope or gscope. If variable already exists in lscope it is also allowed.
 	@Override
 	public void exitLockStat(EmojiLangParser.LockStatContext ctx) {
 		if (this.scope.contains(ctx.ID().getText()) || this.gscope.contains(ctx.ID().getText())) {
@@ -120,6 +121,7 @@ public class Checker extends EmojiLangBaseListener {
 		}
 	}
 	
+	//Checks if the lock exists in lscope.
 	@Override
 	public void exitUnlockStat(EmojiLangParser.UnlockStatContext ctx) {
 		if (!this.lscope.contains(ctx.ID().getText())) {
@@ -127,6 +129,7 @@ public class Checker extends EmojiLangBaseListener {
 		}
 	}
 	
+	//Puts a new variable in gscope if there isn't already a variable with that name in scope gscope or lscop and checks if the declared type equal the type of the expression.
 	@Override
 	public void exitDeclgvar(EmojiLangParser.DeclgvarContext ctx) {
 		if (scopestack.empty() && scope.getScope() == 0) {
@@ -143,6 +146,7 @@ public class Checker extends EmojiLangBaseListener {
 		}
 	}
 	
+	//Checks if join is used in the main thread by checking if the scope stack is empty.
 	@Override
 	public void exitJoinstat(EmojiLangParser.JoinstatContext ctx) {
 		if (!scopestack.empty()) {
@@ -150,13 +154,9 @@ public class Checker extends EmojiLangBaseListener {
 		}
 	}
 	
-	@Override
-	public void exitOutStat(EmojiLangParser.OutStatContext ctx) {
-		
-	}
-	
 	//Target
 	
+	//Checks if variable is in current scope or in gscope and sets it type to this.
 	@Override
 	public void exitIdTarget(EmojiLangParser.IdTargetContext ctx) {
 		String id = ctx.ID().getText();
@@ -176,6 +176,7 @@ public class Checker extends EmojiLangBaseListener {
 	
 	//Expr
 
+	//if the terminal is a minus the expressions has to be an integer and if the terminal is an exclamation mark the expression needs to be a boolean. Sets it's type to the type found.
 	@Override
 	public void exitPrfExpr(EmojiLangParser.PrfExprContext ctx) {
 		Type type;
@@ -189,6 +190,7 @@ public class Checker extends EmojiLangBaseListener {
 		setType(ctx, type);
 	}
 
+	//Checks if both expressions are int types. Sets itself to int.
 	@Override
 	public void exitMultExpr(EmojiLangParser.MultExprContext ctx) {
 		checkType(ctx.expr(0), Type.INT);
@@ -196,6 +198,7 @@ public class Checker extends EmojiLangBaseListener {
 		setType(ctx, Type.INT);
 	}
 
+	//Checks if both expressions are int types. Sets itself to int.
 	@Override
 	public void exitPlusExpr(EmojiLangParser.PlusExprContext ctx) {
 		checkType(ctx.expr(0), Type.INT);
@@ -203,6 +206,7 @@ public class Checker extends EmojiLangBaseListener {
 		setType(ctx, Type.INT);
 	}
 	
+	//Checks if both expressions are boolean types. Sets itself to int.
 	@Override
 	public void exitBoolExpr(EmojiLangParser.BoolExprContext ctx) {
 		checkType(ctx.expr(0), Type.BOOL);
@@ -210,6 +214,7 @@ public class Checker extends EmojiLangBaseListener {
 		setType(ctx, Type.BOOL);
 	}
 
+	//Checks if both expressions are int types. Sets itself to boolean.
 	@Override
 	public void exitCompExpr(EmojiLangParser.CompExprContext ctx) {
 		checkType(ctx.expr(0), Type.INT);
@@ -217,11 +222,13 @@ public class Checker extends EmojiLangBaseListener {
 		setType(ctx, Type.BOOL);
 	}
 
+	//Sets itself to the expression
 	@Override
 	public void exitParExpr(EmojiLangParser.ParExprContext ctx) {
 		setType(ctx, getType(ctx.expr()));
 	}
 
+	//Checks if variable is in current scope or in gscope.
 	@Override
 	public void exitIdExpr(EmojiLangParser.IdExprContext ctx) {
 		String id = ctx.ID().getText();
@@ -239,43 +246,38 @@ public class Checker extends EmojiLangBaseListener {
 		}
 	}
 
+	//Sets itself to int.
 	@Override
 	public void exitNumExpr(EmojiLangParser.NumExprContext ctx) {
 		setType(ctx, Type.INT);
 	}
 	
+	//Sets itself to boolean.
 	@Override
 	public void exitTrueExpr(EmojiLangParser.TrueExprContext ctx) {
 		setType(ctx, Type.BOOL);
 	}
 	
+	//Sets itself to boolean.
 	@Override
 	public void exitFalseExpr(EmojiLangParser.FalseExprContext ctx) {
 		setType(ctx, Type.BOOL);
 	}
 	
 	//Type
-	
+	//Sets itself to boolean.
 	@Override
 	public void exitBoolType(EmojiLangParser.BoolTypeContext ctx) {
 		setType(ctx, Type.BOOL);
 	}
 
+	//Sets itself to int.
 	@Override
 	public void exitIntType(EmojiLangParser.IntTypeContext ctx) {
 		setType(ctx, Type.INT);
 	}
 
-	/** Indicates if any errors were encountered in this tree listener. */
-	public boolean hasErrors() {
-		return !getErrors().isEmpty();
-	}
-
-	/** Returns the list of errors collected in this tree listener. */
-	public List<String> getErrors() {
-		return this.errors;
-	}
-
+	//Checks the type of a node to the expected type.
 	private void checkType(ParserRuleContext node, Type expected) {
 		Type actual = getType(node);
 		if (actual == null) {
@@ -286,6 +288,7 @@ public class Checker extends EmojiLangBaseListener {
 		}
 	}
 
+	//Adds an error to the list of errors.
 	private void addError(ParserRuleContext node, String message,
 			Object... args) {
 		addError(node.getStart(), message, args);
@@ -300,12 +303,14 @@ public class Checker extends EmojiLangBaseListener {
 		this.errors.add(message);
 	}
 
+	//Sets the type of a node.
 	private void setType(ParseTree node, Type type) {
-		this.result.setType(node, type);
+		this.types.put(node, type);
 	}
 
+	//Gets the type of a node.
 	private Type getType(ParseTree node) {
-		return this.result.getType(node);
+		return this.types.get(node);
 	}
 
 }

@@ -126,6 +126,7 @@ public class CheckerTest {
 		check("UnlockThread");
 		}
 
+	//Checks a file and succeeds if a parseException is thrown.
 	private void checkFail(String filename) throws IOException {
 		try {
 			check(filename);
@@ -134,10 +135,12 @@ public class CheckerTest {
 		}
 	}
 	
+	//Checks a file using the type checker.
 	private void check(String filename) throws ParseException, IOException {
 		new Checker().check(parse(filename));
 	}
 
+	//Parses a file.
 	private ParseTree parse(String filename) throws IOException, ParseException {
 		Lexer lexer = new EmojiLangLexer(CharStreams.fromPath(new File(ABS_PATH + BASE_DIR, filename + EXT).toPath()));
 		TokenStream tokens = new CommonTokenStream(lexer);

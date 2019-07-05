@@ -7,35 +7,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+//Symbol table to store type of variables.
+
 public class SymbolTableNestedScopes{
 
-    Map<Integer , Map<String, Type>> scopemap = new TreeMap<>(Collections.reverseOrder());
+	//map of scopes sorted by highest to lowest for ease of use.
+    private Map<Integer , Map<String, Type>> scopemap = new TreeMap<>(Collections.reverseOrder());
+    //Current scope that is being used.
     private Integer currentscope = 0;
-    private List<Integer> sizes = new ArrayList<>();
-    private int size;
 
+
+    //Create first scope.
     public SymbolTableNestedScopes(){
         scopemap.put(currentscope, new HashMap<>());
     }
 
+    //Opens a new scope.
     public void openScope() {
         currentscope++;
         scopemap.put(currentscope, new HashMap<>());
-        sizes.add(size);
-        size = 0;
     }
-
+   
+    //Closes the scope.
     public void closeScope(){
         if(currentscope == 0){
             throw new RuntimeException();
         } else {
             scopemap.remove(currentscope);
-            size = sizes.get(currentscope - 1);
-            sizes.remove(currentscope);
             currentscope--;
         }
     }
 
+    //Add a new variable to the current scope.
     public boolean add(String id, Type type) {
         if(contains(id)){
             return false;
@@ -44,6 +47,7 @@ public class SymbolTableNestedScopes{
         return true;
     }
     
+    //gets the type of a variable going through the top scope first and then down.
 	public Type getType(String id) {
 		for( Map<String, Type> s:scopemap.values()){
             if(s.containsKey(id)){
@@ -53,6 +57,7 @@ public class SymbolTableNestedScopes{
 		return null;
 	}
 
+	//Check if a variable is in the scope.
     public boolean contains(String id) {
         for( Map<String, Type> s:scopemap.values()){
             if(s.containsKey(id)){
@@ -62,6 +67,7 @@ public class SymbolTableNestedScopes{
         return  false;
     }
     
+    //Gets the current scope.
     public int getScope() {
     	return currentscope;
     }
